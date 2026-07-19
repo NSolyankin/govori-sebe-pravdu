@@ -1,4 +1,4 @@
-<!-- Говори себе правду v1.4 | тип задается при создании, пункт Изменить в меню карточки | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 116477 байт -->
+<!-- Говори себе правду v1.5 | надежность: возврат мотива в свою запись, лента партиями, печать по фильтрам, напоминание об архиве | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 118750 байт -->
 <!DOCTYPE html>
 <html lang="ru" data-theme="auto">
 <head>
@@ -823,7 +823,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 'use strict';
 
 /* Версия приложения: дублируется в комментарии первой строки файла (п. 2.3) */
-var APP_VERSION = 'v1.4';
+var APP_VERSION = 'v1.5';
 
 function $(s, r){ return (r || document).querySelector(s); }
 function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -894,8 +894,13 @@ document.addEventListener('visibilitychange', function(){
 /* Стоп-кран второй вкладки (п. 3.6): не синхронизация, а защита от взаимного затирания */
 window.addEventListener('storage', function(e){
   if ((e.key !== null && e.key !== KEY) || tabLock || !storageOk){ return; }
-  if (!entry){ /* экран списка: перечитываю и показываю свежее */
+  if (!entry){ /* экран списка: перечитываю и показываю свежее, включая настройки */
     loadStore();
+    themeMode = THEME_ORDER.indexOf(store.settings.theme) !== -1 ? store.settings.theme : 'auto';
+    applyTheme();
+    applyQuotesSeg();
+    applyDaysSeg();
+    updateLockRows();
     renderList();
     return;
   }
@@ -949,6 +954,19 @@ function touch(){
   if (!entry){ return; }
   entry.updatedAt = new Date().toISOString();
   scheduleSave();
+  editN++;
+  remindExport();
+}
+/* Напоминание о резервной копии: раз в сессию, после 30 правок и 14 суток без выгрузки */
+var editN = 0;
+function markExport(){ store.lastExportAt = new Date().toISOString(); scheduleSave(); }
+function remindExport(){
+  if (editN <= 30 || Date.now() - (Date.parse(store.lastExportAt || '') || 0) < 12096e5){ return; }
+  try {
+    if (sessionStorage.getItem('gsp_exp')){ return; }
+    sessionStorage.setItem('gsp_exp', '1');
+  } catch (e){}
+  toast('Давно не было резервной копии записей', 'Выгрузить .json', exportArchive);
 }
 
 /* ===== Состояние ===== */
@@ -1330,6 +1348,8 @@ var entryListEl = $('#entryList');
 var listQuery = '';
 var typeFilter = 'all';
 var onlyUnrev = false;
+var LIST_PAGE = 50;      /* лента рисуется партиями: телефон не тормозит на сотнях записей */
+var listShown = LIST_PAGE;
 
 function entriesSorted(){
   var arr = [];
@@ -1461,7 +1481,8 @@ function renderList(){
     return;
   }
   var lastDay = null;
-  for (var j = 0; j < arr.length; j++){
+  var upto = Math.min(arr.length, listShown);
+  for (var j = 0; j < upto; j++){
     var k = dayKey(arr[j].createdAt);
     if (k !== lastDay){
       lastDay = k;
@@ -1471,18 +1492,36 @@ function renderList(){
     }
     entryListEl.appendChild(entryCard(arr[j]));
   }
+  if (arr.length > upto){
+    var moreB = el('button', 'btn ghost');
+    moreB.id = 'listMore';
+    moreB.textContent = 'Показать еще (' + (arr.length - upto) + ')';
+    entryListEl.appendChild(moreB);
+  }
 }
 
-$('#listSearch').addEventListener('input', function(){ listQuery = this.value; renderList(); });
-$('#typeSel').addEventListener('change', function(){ typeFilter = this.value; renderList(); });
+var listSearchTimer = null;
+$('#listSearch').addEventListener('input', function(){
+  listQuery = this.value;
+  listShown = LIST_PAGE;
+  clearTimeout(listSearchTimer);
+  listSearchTimer = setTimeout(renderList, 200); /* дебаунс: без перерисовки на каждой букве */
+});
+$('#typeSel').addEventListener('change', function(){ typeFilter = this.value; listShown = LIST_PAGE; renderList(); });
 $('#unrevBtn').addEventListener('click', function(){
   onlyUnrev = !onlyUnrev;
   this.classList.toggle('on', onlyUnrev);
   this.setAttribute('aria-pressed', onlyUnrev ? 'true' : 'false');
+  listShown = LIST_PAGE;
   renderList();
 });
 
 entryListEl.addEventListener('click', function(e){
+  if (e.target.closest('#listMore')){
+    listShown += LIST_PAGE;
+    renderList();
+    return;
+  }
   var card = e.target.closest('.doc');
   if (!card){ return; }
   var en = store.entries[card.getAttribute('data-id')];
@@ -1706,11 +1745,13 @@ document.addEventListener('click', function(e){
   card.parentNode.removeChild(card);
   updateComp();
   if (!isText(buf.m.text)){ return; } /* пустой мотив: без тоста */
+  var owner = entry; /* возврат строго в исходную запись, даже если открыта другая */
   toast('Мотив удален', 'Вернуть', function(){
-    if (!entry){ return; }
-    entry.motives.splice(Math.min(buf.index, entry.motives.length), 0, buf.m);
+    owner.motives.splice(Math.min(buf.index, owner.motives.length), 0, buf.m);
+    owner.updatedAt = new Date().toISOString();
+    scheduleSave();
+    if (entry !== owner){ return; }
     if (buf.m.late && rvOpen){ rvNewIds[buf.m.id] = true; }
-    touch();
     if (rvOpen){ rvRender(); } else { renderMotives(); }
     updateComp();
   });
@@ -1972,11 +2013,15 @@ $('#impCancel').addEventListener('click', function(){ pendingImport = null; clos
 impBk.addEventListener('click', function(e){ if (e.target === impBk){ pendingImport = null; closeLayer(impBk); } });
 
 /* ===== Выгрузка архива: весь корень (п. 7.2) ===== */
-$('#miExpAll').addEventListener('click', function(){
-  closeMenu();
+function exportArchive(){
   if (!entryCount()){ toast('Пока нечего выгружать'); return; }
+  markExport();
   shareOrDownload('govori-sebe-pravdu_arhiv_' + fileStamp() + '.json',
     JSON.stringify(store), 'application/json');
+}
+$('#miExpAll').addEventListener('click', function(){
+  closeMenu();
+  exportArchive();
 });
 
 /* ===== Экспорт одной записи (п. 7.3): порядок - тип, дата, кто, описание, мотивы, отметка, заметка ===== */
@@ -2169,7 +2214,7 @@ function buildPrintView(){
   h1.textContent = 'Говори себе правду';
   printView.appendChild(h1);
   if (printAll || !entry){
-    var all = entriesSorted();
+    var all = listFiltered(); /* печатается видимое: как и экспорт в Obsidian */
     for (var i = 0; i < all.length; i++){ printView.appendChild(printEntryBlock(all[i])); }
   } else {
     printView.appendChild(printEntryBlock(entry));
@@ -2184,7 +2229,7 @@ $('#btnExpPrint').addEventListener('click', function(){
 });
 $('#miPrintAll').addEventListener('click', function(){
   closeMenu();
-  if (!entryCount()){ toast('Пока нечего печатать'); return; }
+  if (!listFiltered().length){ toast('Нет записей по текущим фильтрам'); return; }
   printAll = true;
   buildPrintView();
   window.print();
@@ -2369,6 +2414,8 @@ function lockSubmit(){
       scheduleSave();
       closeLock();
       updateLockRows();
+      updateSetInfo();
+      openLayer(aboutBk); /* вернуть в настройки, откуда начали */
       toast('Код установлен');
     });
     return;
@@ -2393,6 +2440,8 @@ function lockSubmit(){
       scheduleSave();
       closeLock();
       updateLockRows();
+      updateSetInfo();
+      openLayer(aboutBk);
       toast('Код выключен');
       return;
     }
