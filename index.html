@@ -1,4 +1,4 @@
-<!-- Говори себе правду v1.7 | вторая сверка: мышка одна, поле его мотивов для чужого поступка, шаг по шагам в помощнике | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 122262 байт -->
+<!-- Говори себе правду v1.8 | по источникам: тип Столкновение с неожиданностью, Я на эмоциях, мастер пересказа шаг за шагом | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 137981 байт -->
 <!DOCTYPE html>
 <html lang="ru" data-theme="auto">
 <head>
@@ -117,6 +117,8 @@ html[data-theme="dark"] .btn.primary{color:#15171B}
 }
 .btn-add:active{background:var(--press)}
 .addpair{display:flex;gap:10px}
+.addrow2{margin-top:8px}
+.titlefield.cl{margin-top:10px}
 .addbar{
   position:sticky;bottom:0;z-index:10;
   margin:8px -4px 0;padding:12px 4px calc(10px + env(safe-area-inset-bottom));
@@ -442,6 +444,8 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
     </div>
 
     <div id="listFull">
+      <!-- Снятие гнева перед записью (СТвВиО, вопрос 95) -->
+      <button type="button" class="digbtn" id="btnCalm">Я на эмоциях: снять гнев перед записью</button>
       <!-- Полка "Пора перечитать" (п. 4.3): записи старше reviewDays без отметки -->
       <div class="shelf" id="shelf" hidden>
         <div class="shelf-title">Пора перечитать</div>
@@ -455,6 +459,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
           <option value="all">все</option>
           <option value="own">свои</option>
           <option value="judge">чужие</option>
+          <option value="clash">столкновения</option>
         </select>
         <button type="button" class="sortbtn" id="unrevBtn" aria-pressed="false">Неперечитанные</button>
       </div>
@@ -474,6 +479,9 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <div class="addpair">
         <button class="btn-add" data-new="own">+ Свой поступок</button>
         <button class="btn-add" data-new="judge">+ Чужой поступок</button>
+      </div>
+      <div class="addpair addrow2">
+        <button class="btn-add" data-new="clash">+ Столкновение с неожиданностью</button>
       </div>
     </div>
 
@@ -517,6 +525,20 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <textarea id="taHis" rows="1" maxlength="2000" placeholder="Почему он мог так поступить? Сначала понять - потом решать, осуждать ли"></textarea>
     </section>
 
+    <!-- Разбор столкновения с неожиданностью: пустое - твердое - сценарий (Уроки 8-9) -->
+    <section class="titlefield cl" id="gapField" hidden>
+      <div class="decision-label">Пустое</div>
+      <textarea id="taGap" rows="1" maxlength="2000" placeholder="На что оперся, а оно подломилось?"></textarea>
+    </section>
+    <section class="titlefield" id="firmField" hidden>
+      <div class="decision-label">Твердое</div>
+      <textarea id="taFirm" rows="1" maxlength="2000" placeholder="Что теперь твердое в картине мира?"></textarea>
+    </section>
+    <section class="titlefield" id="planField" hidden>
+      <div class="decision-label">Сценарий</div>
+      <textarea id="taPlan" rows="1" maxlength="2000" placeholder="Что делать в новых условиях новой картины мира?"></textarea>
+    </section>
+
     <div class="balance">
       <span class="pill" id="mtvCount">мотивов пока нет</span>
       <button type="button" class="pill comp" id="compPill" aria-label="Полнота записи, подробнее">полнота 0 из 5</button>
@@ -530,6 +552,12 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <div class="rb-title" id="rvBarTitle"></div>
       <div class="rb-note" id="rvBarNote" hidden></div>
       <button type="button" class="rb-again" id="btnRvAgain">Перечитать снова</button>
+    </div>
+
+    <!-- Пересказ шаг за шагом (глава "Как мне сказать правду..."): доступ к собранному пересказу -->
+    <div class="reviewbar" id="rtBar" hidden>
+      <div class="rb-title">Пересказ шаг за шагом</div>
+      <button type="button" class="rb-again" id="btnRtOpen">Открыть пересказ</button>
     </div>
 
     <!-- Мотивы: строит renderMotives, ввод без перерендера списка (п. 5.3) -->
@@ -569,7 +597,19 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <div class="ro-label">Его причины и мотивы</div>
       <div class="ro-text" id="rvHis"></div>
     </div>
-    <div class="ro">
+    <div class="ro" id="rvGapBox" hidden>
+      <div class="ro-label">Пустое</div>
+      <div class="ro-text" id="rvGap"></div>
+    </div>
+    <div class="ro" id="rvFirmBox" hidden>
+      <div class="ro-label">Твердое</div>
+      <div class="ro-text" id="rvFirm"></div>
+    </div>
+    <div class="ro" id="rvPlanBox" hidden>
+      <div class="ro-label">Сценарий</div>
+      <div class="ro-text" id="rvPlan"></div>
+    </div>
+    <div class="ro" id="rvMtvBox">
       <div class="ro-label">Мотивы</div>
       <div id="rvMtvs"></div>
     </div>
@@ -588,6 +628,40 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <div class="decision-label">Заметка</div>
       <textarea id="taRvNote" rows="1" maxlength="2000" placeholder="Что увиделось при перечитывании (необязательно)"></textarea>
     </section>
+  </div>
+</div>
+
+<!-- ===== Лист: Я на эмоциях (СТвВиО, вопрос 95, дословные шаги) ===== -->
+<div class="layer-bk" id="calmBk" hidden>
+  <div class="sheet" role="dialog" aria-label="Я на эмоциях">
+    <div class="handle"></div>
+    <h2>Я на эмоциях</h2>
+    <p class="dig-q">1. Если можно, сделайте перерыв.</p>
+    <p class="dig-q">2. Посмотрите внутренним зрением, где эта эмоция находится - в организме или в мозгу.</p>
+    <p class="dig-q">3. Подумайте чуть-чуть и попробуйте разглядеть это место внутренним зрением.</p>
+    <p class="dig-q">4. Эмоция исчезнет: человек не может одновременно и переживать эмоцию, и разглядывать ее.</p>
+    <p class="dig-note">По В.К. Тарасову. Когда эмоция уйдет, возвращайтесь к записи</p>
+  </div>
+</div>
+
+<!-- ===== Слой: Мастер пересказа шаг за шагом ===== -->
+<div class="rv" id="rt" hidden>
+  <div class="rv-head">
+    <div class="rv-head-in">
+      <button class="rv-act" id="rtClose">Закрыть</button>
+      <div class="rv-title" id="rtTitle">Пересказ</div>
+      <button class="rv-act" id="rtNext">Дальше</button>
+    </div>
+  </div>
+  <div class="rv-wrap">
+    <p class="hint" id="rtHint"></p>
+    <section class="decision">
+      <div class="decision-label" id="rtLabel"></div>
+      <textarea id="taRt" rows="1" maxlength="2000" placeholder="Расскажите себе"></textarea>
+    </section>
+    <div class="rv-addrow">
+      <button type="button" class="btn-add" id="rtBack" hidden>Назад</button>
+    </div>
   </div>
 </div>
 
@@ -738,6 +812,15 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <p class="set-h">Перечитывание</p>
       <p>Спустя дни запись видится иначе. Полка «Пора перечитать» собирает записи старше выбранного срока без отметки. При перечитывании исходное не правится: можно дописать поздние мотивы (они получают метку), поставить отметку - запись была честной, не вполне, главного не увидел - и заметку. Перечитывать можно повторно.</p>
 
+      <p class="set-h">Столкновение с неожиданностью</p>
+      <p>Третий тип записи - разбор неудачи или обманутого ожидания. Переживая столкновение с неожиданностью, мы понимаем, что было пустое в нашей картине мира, и меняем его на твердое. Твердое - то, на что можно опереться и не провалиться; пустое - когда оперся, а оно подломилось. Разбор заканчивается сценарием: что делать в новых условиях новой картины мира.</p>
+
+      <p class="set-h">Пересказ шаг за шагом</p>
+      <p>Прежде чем рассказывать правду другому, расскажите ее сначала самому себе, начиная с причин. Мастер (в меню записи) ведет по четырем шагам: причины - что предшествовало событию; обстановка - какая была погода, как были одеты, какое было настроение; хронология - что случилось, кого увидели, шаг за шагом; точка признания - где именно я пожадничал, испугался, позавидовал: дойти и признать. После этого правду уже не страшно рассказать другим.</p>
+
+      <p class="set-h">Я на эмоциях</p>
+      <p>Если вошли в состояние гнева, сделайте перерыв. Если перерыв невозможен, посмотрите внутренним зрением, где эта эмоция находится - в организме или в мозгу, и попробуйте разглядеть это место: эмоция исчезнет, потому что человек не может одновременно и переживать эмоцию, и разглядывать ее.</p>
+
       <p class="set-h">Хранение</p>
       <p>Записи хранятся только в этом браузере на этом устройстве: сервера, сети и регистрации нет. Очистка данных браузера удалит записи: регулярно выгружайте архив .json. Перенос на другое устройство - только файлом архива; ссылки-снимка здесь нет намеренно.</p>
 
@@ -775,6 +858,8 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 
 <div class="pop" id="popEd" hidden>
   <button id="miReread"><svg class="icon"><use href="#i-check"/></svg>Перечитать</button>
+  <button id="miRetell"><svg class="icon"><use href="#i-edit"/></svg>Пересказ шаг за шагом</button>
+  <button id="miCalm"><svg class="icon"><use href="#i-check"/></svg>Я на эмоциях</button>
   <hr>
   <button class="danger" id="miDelEntry"><svg class="icon"><use href="#i-trash"/></svg>Удалить запись</button>
 </div>
@@ -833,7 +918,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 'use strict';
 
 /* Версия приложения: дублируется в комментарии первой строки файла (п. 2.3) */
-var APP_VERSION = 'v1.7';
+var APP_VERSION = 'v1.8';
 
 function $(s, r){ return (r || document).querySelector(s); }
 function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -924,13 +1009,14 @@ var MAX_ENTRIES = 20000;
 var MAX_MOTIVES = 20;
 function makeEntry(type){
   var now = new Date().toISOString();
-  return { id: uid(), type: type === 'judge' ? 'judge' : 'own', act: '', who: '', his: '',
+  return { id: uid(), type: (type === 'judge' || type === 'clash') ? type : 'own', act: '', who: '', his: '',
+    gap: '', firm: '', plan: '', retell: null,
     motives: [], review: '', reviewAt: '', reviewNote: '', createdAt: now, updatedAt: now };
 }
 function makeMotive(late){
   return { id: uid(), text: '', kind: 'nice', key: false, late: late === true };
 }
-var TYPE_LABEL = { own: 'свой поступок', judge: 'чужой поступок' };
+var TYPE_LABEL = { own: 'свой поступок', judge: 'чужой поступок', clash: 'столкновение' };
 var KIND_LABEL = { nice: 'симпатичный', notnice: 'не очень' };
 var REVIEW_CODES = ['honest', 'partly', 'blind'];
 var REVIEW_LABEL = { honest: 'честно', partly: 'не вполне', blind: 'главного не увидел' };
@@ -951,6 +1037,11 @@ function plural(n, one, few, many){
 }
 /* Счетчик вида "3 мотива, из них 1 не очень" (п. 4.3) */
 function motiveSummary(en){
+  if (en.type === 'clash'){ /* карточка столкновения: продвижение разбора */
+    var cc = completeness(en), f4 = 0;
+    for (var ci = 0; ci < 4; ci++){ if (cc.crit[ci]){ f4++; } }
+    return 'разобрано ' + f4 + ' из 4';
+  }
   var f = filledMotives(en);
   if (!f.length){ return 'мотивов пока нет'; }
   var m = 0;
@@ -1084,13 +1175,20 @@ $('#daysSeg').addEventListener('click', function(e){
 
 /* ===== Индикатор полноты записи (п. 5.4): 5 критериев, считается на лету ===== */
 function completeness(en){
+  var crit;
+  if (en.type === 'clash'){ /* разбор неудачи: пустое - твердое - сценарий (Уроки 8-9) */
+    crit = [isText(en.act), isText(en.gap), isText(en.firm), isText(en.plan), en.review !== ''];
+    var nc = 0;
+    for (var jc = 0; jc < crit.length; jc++){ if (crit[jc]){ nc++; } }
+    return { n: nc, crit: crit };
+  }
   var f = filledMotives(en);
   var hasNotNice = false, hasKey = false;
   for (var i = 0; i < f.length; i++){
     if (f[i].kind === 'notnice'){ hasNotNice = true; }
     if (f[i].key === true){ hasKey = true; }
   }
-  var crit = [
+  crit = [
     isText(en.act),
     f.length >= 2,
     hasNotNice,
@@ -1115,6 +1213,20 @@ var COMP_TODO = [
   'Отметьте мотив, без которого ничего бы не состоялось',
   'Вернитесь к записи через несколько дней и перечитайте'
 ];
+var COMP_DONE_CL = [
+  'Столкновение описано',
+  '«Пустое» найдено',
+  '«Твердое» сформулировано',
+  'Сценарий построен',
+  'Запись перечитана'
+];
+var COMP_TODO_CL = [
+  'Опишите, что оказалось неожиданностью',
+  'На что оперся, а оно подломилось?',
+  'Что теперь твердое в картине мира?',
+  'Что делать в новых условиях новой картины мира?',
+  'Вернитесь к записи через несколько дней и перечитайте'
+];
 var compBk = $('#compBk');
 function updateComp(){
   if (!entry){ return; }
@@ -1130,7 +1242,9 @@ function buildCompList(){
     var mark = el('span', 'comp-mark');
     mark.textContent = r.crit[i] ? '✓' : '○';
     var txt = el('span', 'comp-txt');
-    txt.textContent = r.crit[i] ? COMP_DONE[i] : COMP_TODO[i];
+    txt.textContent = r.crit[i]
+      ? (entry.type === 'clash' ? COMP_DONE_CL : COMP_DONE)[i]
+      : (entry.type === 'clash' ? COMP_TODO_CL : COMP_TODO)[i];
     row.appendChild(mark); row.appendChild(txt);
     host.appendChild(row);
   }
@@ -1372,7 +1486,8 @@ function entriesSorted(){
 }
 /* Поиск по act, who, мотивам и reviewNote (п. 4.3) */
 function entrySearchText(en){
-  var parts = [en.act || '', en.who || '', en.his || '', en.reviewNote || ''];
+  var parts = [en.act || '', en.who || '', en.his || '', en.gap || '', en.firm || '', en.plan || '', en.reviewNote || ''];
+  if (en.retell){ parts.push(en.retell.pre || '', en.retell.env || '', en.retell.seq || '', en.retell.spot || ''); }
   for (var i = 0; i < en.motives.length; i++){ parts.push(en.motives[i].text || ''); }
   return parts.join('\n').toLowerCase();
 }
@@ -1617,9 +1732,9 @@ var mtvListEl = $('#mtvList');
 var taAct = $('#taAct');
 var inWho = $('#inWho');
 
-var ACT_LABEL = { own: 'Поступок', judge: 'Оценка' };
-var ACT_PH = { own: 'Что я сделал или решил?', judge: 'Чей поступок и в чем состояла моя оценка?' };
-var ED_TITLE = { own: 'Свой поступок', judge: 'Чужой поступок' };
+var ACT_LABEL = { own: 'Поступок', judge: 'Оценка', clash: 'Столкновение' };
+var ACT_PH = { own: 'Что я сделал или решил?', judge: 'Чей поступок и в чем состояла моя оценка?', clash: 'В чем состояло столкновение с неожиданностью?' };
+var ED_TITLE = { own: 'Свой поступок', judge: 'Чужой поступок', clash: 'Столкновение с неожиданностью' };
 
 function applyType(){
   var t = entry.type;
@@ -1628,6 +1743,14 @@ function applyType(){
   taAct.setAttribute('placeholder', ACT_PH[t]);
   $('#whoField').hidden = t !== 'judge';
   $('#hisField').hidden = t !== 'judge';
+  var cl = t === 'clash';
+  $('#gapField').hidden = !cl;
+  $('#firmField').hidden = !cl;
+  $('#planField').hidden = !cl;
+  $('#mtvList').hidden = cl;
+  $('#btnAddMtv').hidden = cl;
+  $('#btnDig').hidden = cl;
+  $('#mtvCount').hidden = cl;
 }
 /* Карточка мотива (п. 5.2): чипы "симпатичный | не очень" и "мышка", метка "дописан позже" */
 function motiveCard(m){
@@ -1714,6 +1837,14 @@ document.addEventListener('input', function(e){
     grow(t);
     entry.his = t.value;
     touch();
+    return;
+  }
+  if (t.id === 'taGap'){ grow(t); entry.gap = t.value; touch(); updateComp(); return; }
+  if (t.id === 'taFirm'){ grow(t); entry.firm = t.value; touch(); updateComp(); return; }
+  if (t.id === 'taPlan'){ grow(t); entry.plan = t.value; touch(); updateComp(); return; }
+  if (t.id === 'taRt'){ /* мастер пересказа: живое сохранение шага */
+    grow(t);
+    if (entry && entry.retell){ entry.retell[RT_STEPS[rtStep].k] = t.value; touch(); }
     return;
   }
   if (t.tagName === 'TEXTAREA' && t.getAttribute('data-mid')){
@@ -1813,9 +1944,13 @@ function enterEditor(en){
   applyType();
   inWho.value = en.who || '';
   $('#taHis').value = en.his || '';
+  $('#taGap').value = en.gap || '';
+  $('#taFirm').value = en.firm || '';
+  $('#taPlan').value = en.plan || '';
   taAct.value = en.act || '';
   renderMotives();
   renderRvBar();
+  renderRtBar();
   updateComp();
   updateHint();
   go('scrEditor');
@@ -1833,7 +1968,10 @@ function goList(){
 $('#btnBack').addEventListener('click', goList);
 
 /* Меню редактора: перечитать, удалить запись (возврат из тоста, п. 11.1) */
-$('#btnEdMenu').addEventListener('click', function(){ openMenu($('#popEd'), $('#btnEdMenu')); });
+$('#btnEdMenu').addEventListener('click', function(){
+  $('#miRetell').style.display = (entry && entry.type === 'clash') ? 'none' : '';
+  openMenu($('#popEd'), $('#btnEdMenu'));
+});
 $('#miReread').addEventListener('click', function(){ closeMenu(); if (entry){ openReview(); } });
 $('#miDelEntry').addEventListener('click', function(){
   closeMenu();
@@ -1871,6 +2009,11 @@ function roMotiveRow(m){
   }
   return row;
 }
+function roBox(boxSel, txtSel, show, val){
+  var b = $(boxSel);
+  if (show){ b.hidden = false; $(txtSel).textContent = isText(val) ? val : '(не заполнено)'; }
+  else { b.hidden = true; }
+}
 function syncRvSeg(){
   $$('#rvSeg [data-rv-opt]').forEach(function(b){
     b.classList.toggle('on', b.getAttribute('data-rv-opt') === rvChoice);
@@ -1892,6 +2035,12 @@ function rvRender(){
     hisBox.hidden = false;
     $('#rvHis').textContent = entry.his;
   } else { hisBox.hidden = true; }
+  var isCl = entry.type === 'clash';
+  $('#rvMtvBox').hidden = isCl;
+  $('#rvAddMtv').hidden = isCl;
+  roBox('#rvGapBox', '#rvGap', isCl, entry.gap);
+  roBox('#rvFirmBox', '#rvFirm', isCl, entry.firm);
+  roBox('#rvPlanBox', '#rvPlan', isCl, entry.plan);
   var host = $('#rvMtvs');
   while (host.firstChild){ host.removeChild(host.firstChild); }
   var shown = 0;
@@ -1932,6 +2081,7 @@ function closeReview(){
   /* поздние мотивы уже в записи: показать их в редакторе (п. 6.2) */
   renderMotives();
   renderRvBar();
+  renderRtBar();
   updateComp();
 }
 $('#rvClose').addEventListener('click', closeReview);
@@ -1958,13 +2108,102 @@ $('#rvSave').addEventListener('click', function(){
 });
 /* Примечание к вводу заметки: сохраняется только по кнопке Сохранить (п. 6.3) */
 
+/* ===== Мастер пересказа "с причин, шаг за шагом" (глава "Как мне сказать правду...", Урок 15) ===== */
+var rtEl = $('#rt');
+var rtOpen = false;
+var rtStep = 0;
+var RT_STEPS = [
+  { k: 'pre', label: 'Причины', hint: 'Начните с причин: что предшествовало этому событию?' },
+  { k: 'env', label: 'Обстановка', hint: 'Какая была обстановка: какая была погода, как были одеты, какое было настроение?' },
+  { k: 'seq', label: 'Хронология', hint: 'Расскажите шаг за шагом: что случилось, кого увидели?' },
+  { k: 'spot', label: 'Точка признания', hint: 'Укажите конкретное место: где именно возник мотив - пожадничал, испугался, позавидовал. Дойдите технологично и признайте' }
+];
+function rtShow(){
+  var st = RT_STEPS[rtStep];
+  $('#rtTitle').textContent = 'Пересказ: шаг ' + (rtStep + 1) + ' из ' + RT_STEPS.length;
+  $('#rtLabel').textContent = st.label;
+  $('#rtHint').textContent = st.hint;
+  $('#rtNext').textContent = rtStep === RT_STEPS.length - 1 ? 'Готово' : 'Дальше';
+  $('#rtBack').hidden = rtStep === 0;
+  var ta = $('#taRt');
+  ta.value = entry.retell[st.k] || '';
+  grow(ta);
+  rtEl.scrollTop = 0;
+}
+function openRetell(){
+  if (!entry){ return; }
+  if (!entry.retell){ entry.retell = { pre: '', env: '', seq: '', spot: '' }; }
+  rtOpen = true;
+  rtStep = 0;
+  rtEl.hidden = false;
+  lock(true);
+  rtShow();
+}
+function closeRetell(){
+  if (!rtOpen){ return; }
+  rtOpen = false;
+  rtEl.hidden = true;
+  lock(false);
+  renderRtBar();
+}
+function hasRetell(en){
+  if (!en || !en.retell){ return false; }
+  for (var i = 0; i < RT_STEPS.length; i++){ if (isText(en.retell[RT_STEPS[i].k])){ return true; } }
+  return false;
+}
+function renderRtBar(){
+  $('#rtBar').hidden = !hasRetell(entry);
+}
+/* Пары "шаг - текст" для экспорта и печати */
+function retellPairs(en){
+  var out = [];
+  if (!en || !en.retell){ return out; }
+  for (var i = 0; i < RT_STEPS.length; i++){
+    var v = en.retell[RT_STEPS[i].k];
+    if (isText(v)){ out.push([RT_STEPS[i].label, v]); }
+  }
+  return out;
+}
+$('#rtClose').addEventListener('click', closeRetell);
+$('#rtBack').addEventListener('click', function(){ if (rtStep > 0){ rtStep--; rtShow(); } });
+$('#rtNext').addEventListener('click', function(){
+  if (rtStep < RT_STEPS.length - 1){ rtStep++; rtShow(); return; }
+  closeRetell();
+  toast('Пересказ сохранен в записи');
+});
+$('#btnRtOpen').addEventListener('click', openRetell);
+$('#miRetell').addEventListener('click', function(){ closeMenu(); if (entry && entry.type !== 'clash'){ openRetell(); } });
+
+/* ===== Я на эмоциях: снятие гнева разглядыванием (СТвВиО, вопрос 95) ===== */
+var calmBk = $('#calmBk');
+$('#btnCalm').addEventListener('click', function(){ openLayer(calmBk); });
+$('#miCalm').addEventListener('click', function(){ closeMenu(); openLayer(calmBk); });
+calmBk.addEventListener('click', function(e){ if (e.target === calmBk){ closeLayer(calmBk); } });
+
 /* ===== Белый список при загрузке (п. 10.1): чужие данные не доверяются ===== */
 function sanitizeEntry(raw){
   if (!raw || typeof raw !== 'object'){ throw new Error('структура'); }
-  var e = makeEntry(raw.type === 'judge' ? 'judge' : 'own');
+  var e = makeEntry(raw.type);
   if (typeof raw.act === 'string'){ e.act = raw.act.slice(0, 2000); }
   if (e.type === 'judge' && typeof raw.who === 'string'){ e.who = raw.who.slice(0, 120); }
   if (e.type === 'judge' && typeof raw.his === 'string'){ e.his = raw.his.slice(0, 2000); }
+  if (e.type === 'clash'){
+    if (typeof raw.gap === 'string'){ e.gap = raw.gap.slice(0, 2000); }
+    if (typeof raw.firm === 'string'){ e.firm = raw.firm.slice(0, 2000); }
+    if (typeof raw.plan === 'string'){ e.plan = raw.plan.slice(0, 2000); }
+  }
+  if (e.type !== 'clash' && raw.retell && typeof raw.retell === 'object'){
+    var rt = { pre: '', env: '', seq: '', spot: '' };
+    var rtAny = false;
+    var rtKeys = ['pre', 'env', 'seq', 'spot'];
+    for (var rk = 0; rk < rtKeys.length; rk++){
+      if (typeof raw.retell[rtKeys[rk]] === 'string'){
+        rt[rtKeys[rk]] = raw.retell[rtKeys[rk]].slice(0, 2000);
+        if (isText(rt[rtKeys[rk]])){ rtAny = true; }
+      }
+    }
+    if (rtAny){ e.retell = rt; }
+  }
   if (raw.motives !== undefined && !Array.isArray(raw.motives)){ throw new Error('мотивы'); }
   if (Array.isArray(raw.motives)){
     if (raw.motives.length > MAX_MOTIVES){ throw new Error('мотивы'); } /* лимит п. 3.4 - исключение */
@@ -2069,7 +2308,7 @@ function mdMotiveLine(m){
 }
 function buildMd(en){
   var lines = [];
-  lines.push('# ' + (en.type === 'judge' ? 'Чужой поступок' : 'Свой поступок'));
+  lines.push('# ' + (en.type === 'clash' ? 'Столкновение с неожиданностью' : (en.type === 'judge' ? 'Чужой поступок' : 'Свой поступок')));
   lines.push('');
   lines.push('Дата: ' + fmtDate(en.createdAt));
   if (en.type === 'judge' && isText(en.who)){ lines.push('Кто: ' + flatLine(en.who)); }
@@ -2078,13 +2317,25 @@ function buildMd(en){
   if (en.type === 'judge' && isText(en.his)){
     lines.push('Его причины и мотивы: ' + flatLine(en.his));
   }
-  lines.push('');
-  lines.push('Мотивы:');
-  var f = filledMotives(en);
-  if (f.length){
-    for (var i = 0; i < f.length; i++){ lines.push(mdMotiveLine(f[i])); }
+  if (en.type === 'clash'){
+    lines.push('Пустое: ' + (isText(en.gap) ? flatLine(en.gap) : '(не найдено)'));
+    lines.push('Твердое: ' + (isText(en.firm) ? flatLine(en.firm) : '(не сформулировано)'));
+    lines.push('Сценарий: ' + (isText(en.plan) ? flatLine(en.plan) : '(не построен)'));
   } else {
-    lines.push('- (мотивы не записаны)');
+    lines.push('');
+    lines.push('Мотивы:');
+    var f = filledMotives(en);
+    if (f.length){
+      for (var i = 0; i < f.length; i++){ lines.push(mdMotiveLine(f[i])); }
+    } else {
+      lines.push('- (мотивы не записаны)');
+    }
+    var rp = retellPairs(en);
+    if (rp.length){
+      lines.push('');
+      lines.push('Пересказ шаг за шагом:');
+      for (var r = 0; r < rp.length; r++){ lines.push('- ' + rp[r][0] + ': ' + flatLine(rp[r][1])); }
+    }
   }
   if (en.review){
     lines.push('');
@@ -2210,7 +2461,7 @@ function clearPrintView(){
 function printEntryBlock(en){
   var box = el('div', 'pentry');
   var h = el('p', 'pdate');
-  h.textContent = (en.type === 'judge' ? 'Чужой поступок' : 'Свой поступок') +
+  h.textContent = (en.type === 'clash' ? 'Столкновение с неожиданностью' : (en.type === 'judge' ? 'Чужой поступок' : 'Свой поступок')) +
     ' · ' + fmtDate(en.createdAt) +
     (en.type === 'judge' && isText(en.who) ? ' · ' + flatLine(en.who) : '');
   box.appendChild(h);
@@ -2228,7 +2479,19 @@ function printEntryBlock(en){
     ph.appendChild(document.createTextNode(flatLine(en.his)));
     box.appendChild(ph);
   }
-  var f = filledMotives(en);
+  if (en.type === 'clash'){
+    var pcl = [['Пустое', en.gap], ['Твердое', en.firm], ['Сценарий', en.plan]];
+    for (var pi = 0; pi < pcl.length; pi++){
+      if (!isText(pcl[pi][1])){ continue; }
+      var pp = el('p');
+      var pm2 = el('span', 'pmark');
+      pm2.textContent = pcl[pi][0] + ': ';
+      pp.appendChild(pm2);
+      pp.appendChild(document.createTextNode(flatLine(pcl[pi][1])));
+      box.appendChild(pp);
+    }
+  }
+  var f = en.type === 'clash' ? [] : filledMotives(en);
   if (f.length){
     var ul = el('ul');
     for (var i = 0; i < f.length; i++){
@@ -2244,6 +2507,15 @@ function printEntryBlock(en){
       ul.appendChild(li);
     }
     box.appendChild(ul);
+  }
+  var rp2 = retellPairs(en);
+  for (var ri = 0; ri < rp2.length; ri++){
+    var rpp = el('p');
+    var rpm = el('span', 'pmark');
+    rpm.textContent = rp2[ri][0] + ': ';
+    rpp.appendChild(rpm);
+    rpp.appendChild(document.createTextNode(flatLine(rp2[ri][1])));
+    box.appendChild(rpp);
   }
   if (en.review){
     var pr = el('p');
@@ -2285,11 +2557,13 @@ window.addEventListener('afterprint', function(){ clearPrintView(); printAll = f
 
 /* ===== Итоги (п. 7.1): на лету, без полос-достижений и наград ===== */
 function statsFor(list){
-  var s = { total: 0, own: 0, judge: 0, reviewed: 0, nice: 0, notnice: 0, withKey: 0, single: 0 };
+  var s = { total: 0, own: 0, judge: 0, clash: 0, reviewed: 0, nice: 0, notnice: 0, withKey: 0, single: 0 };
   for (var i = 0; i < list.length; i++){
     var en = list[i];
     s.total++;
-    if (en.type === 'judge'){ s.judge++; } else { s.own++; }
+    if (en.type === 'judge'){ s.judge++; }
+    else if (en.type === 'clash'){ s.clash++; }
+    else { s.own++; }
     if (en.review){ s.reviewed++; }
     var f = filledMotives(en);
     var hasKey = false;
@@ -2336,6 +2610,7 @@ function buildStats(){
   row('Записей всего', a.total, b.total);
   row('Своих поступков', a.own, b.own);
   row('Чужих поступков', a.judge, b.judge);
+  row('Столкновений', a.clash, b.clash);
   row('Перечитано', a.reviewed, b.reviewed);
   row('Мотивов «симпатичных»', a.nice, b.nice);
   row('Мотивов «не очень»', a.notnice, b.notnice);
@@ -2373,6 +2648,8 @@ document.addEventListener('keydown', function(e){
   if (!compBk.hidden){ closeLayer(compBk); return; }
   if (!digBk.hidden){ closeLayer(digBk); return; }
   if (!statsBk.hidden){ closeLayer(statsBk); return; }
+  if (!calmBk.hidden){ closeLayer(calmBk); return; }
+  if (rtOpen){ closeRetell(); return; }
   if (rvOpen){ closeReview(); }
 });
 
