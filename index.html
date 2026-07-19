@@ -1,4 +1,4 @@
-<!-- Говори себе правду v1.6 | сверка с первоисточниками Тарасова: правки формулировок справки и подсказки полноты | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 119275 байт -->
+<!-- Говори себе правду v1.7 | вторая сверка: мышка одна, поле его мотивов для чужого поступка, шаг по шагам в помощнике | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 122262 байт -->
 <!DOCTYPE html>
 <html lang="ru" data-theme="auto">
 <head>
@@ -511,6 +511,12 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <textarea id="taAct" rows="1" maxlength="2000" placeholder="Что я сделал или решил?"></textarea>
     </section>
 
+    <!-- Два такта разбора чужого поступка (вторая сверка, п. 12): сначала понять его -->
+    <section class="titlefield" id="hisField" hidden>
+      <div class="decision-label">Его причины и мотивы</div>
+      <textarea id="taHis" rows="1" maxlength="2000" placeholder="Почему он мог так поступить? Сначала понять - потом решать, осуждать ли"></textarea>
+    </section>
+
     <div class="balance">
       <span class="pill" id="mtvCount">мотивов пока нет</span>
       <button type="button" class="pill comp" id="compPill" aria-label="Полнота записи, подробнее">полнота 0 из 5</button>
@@ -558,6 +564,10 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
     <div class="ro" id="rvWhoBox" hidden>
       <div class="ro-label">Кто</div>
       <div class="ro-text" id="rvWho"></div>
+    </div>
+    <div class="ro" id="rvHisBox" hidden>
+      <div class="ro-label">Его причины и мотивы</div>
+      <div class="ro-text" id="rvHis"></div>
     </div>
     <div class="ro">
       <div class="ro-label">Мотивы</div>
@@ -705,7 +715,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 
     <div class="set-about">
       <p class="set-h">О приложении «Говори себе правду»</p>
-      <p>Личный дневник мотивов по второй ценности Таллинской школы менеджеров. Запись фиксирует поступок или оценку чужого поступка и всю комбинацию мотивов за ними: и симпатичных, и не очень. Пара к приложению «А что потом?»: то смотрит вперед, на последствия решения, это - назад, на мотивы поступка.</p>
+      <p>Личный дневник мотивов по второй ценности Таллинской школы менеджеров. Запись фиксирует поступок или оценку чужого поступка и всю комбинацию мотивов за ними: и симпатичных, и не очень. Пара к приложению «А что потом?»: то смотрит вперед, на последствия решения, это - назад, на мотивы поступка. Если поступок еще не совершен и хочется увидеть, чем все закончится, разберите замысел там.</p>
 
       <p class="set-h">Зачем говорить себе правду</p>
       <p>Цель практики - адекватная картина мира: находить нестыковки между своей схемой лабиринта и реальностью, различать пустое и твердое. «Радость неудачи» - первое легкое чувство при столкновении с неожиданностью: карта стала точнее; огорчение приходит уже следом. Практика ежедневна: этому непростому искусству надо учиться, преодолевая привычку к самообману, которую формирует социум. Это терпеливая работа, а не разовый акт.</p>
@@ -714,16 +724,16 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <p>От правды уводят два пути: чрезмерно себя оправдывать и чрезмерно себя казнить. Это два способа ухода от одной и той же правды. Задача - сказать себе правду точно, как она есть, ни больше, ни меньше. Тексты приложения намеренно не подталкивают ни к тому, ни к другому.</p>
 
       <p class="set-h">«Мышка» из репки</p>
-      <p>Человеку свойственно легендировать прошлое - объяснять его себе упрощенно, оставляя пару сильных и красивых мотивов и забывая слабые и неэтичные. Но как в сказке о репке, без мышки - самого слабого участника - результата бы не было: без самого слабого мотива поступок подчас не был бы совершен. Отметка «мышка» на мотиве значит: без него поступок или оценка не состоялись бы.</p>
+      <p>Человеку свойственно легендировать прошлое - объяснять его себе упрощенно, оставляя пару сильных и красивых мотивов и забывая слабые и неэтичные. Но как в сказке о репке, без мышки - самого слабого участника - результата бы не было: без самого слабого мотива поступок подчас не был бы совершен. Отметка «мышка» на мотиве значит: без него поступок или оценка не состоялись бы. Мышка в записи одна - как решающая гирька на весах.</p>
 
       <p class="set-h">Алиби для самого себя</p>
       <p>«Не ищите алиби»: не изображайте управление и кипучую деятельность вместо того, чтобы управлять и достигать результата. Вопросы помощника «Копнуть глубже» помогают вовремя увидеть это искушение.</p>
 
       <p class="set-h">Оценка чужих поступков</p>
-      <p>Меньше осуждай чужое поведение, больше спрашивай о его причинах и мотивах. Сначала понять - потом решать, осуждать ли. Понимание не означает обязательного прощения. Для таких записей есть отдельный тип «Чужой поступок» со своим набором наводящих вопросов.</p>
+      <p>Меньше осуждай чужое поведение, больше спрашивай о его причинах и мотивах. Сначала понять - потом решать, осуждать ли. Понимание не означает обязательного прощения. Для таких записей есть отдельный тип «Чужой поступок»: сначала поле «Его причины и мотивы» - понять человека, затем ваши мотивы оценки - и свой набор наводящих вопросов.</p>
 
       <p class="set-h">Запись и мотивы</p>
-      <p>Опишите поступок или оценку, затем добавляйте мотивы. У мотива два свойства: «симпатичный | не очень» и отметка «мышка». Индикатор полноты подсказывает пять шагов честной записи, но ничего не требует. «Копнуть глубже» открывает наводящие вопросы; ответы вы сами записываете в мотивы, приложение ничего не сочиняет. Если несимпатичный мотив честно не находится, не выдумывайте его: правда - ни больше, ни меньше.</p>
+      <p>Опишите поступок или оценку, затем добавляйте мотивы - их легче увидеть, восстановив картину по шагам: что предшествовало, какая была обстановка, что случилось и где возник каждый мотив. У мотива два свойства: «симпатичный | не очень» и отметка «мышка». Индикатор полноты подсказывает пять шагов честной записи, но ничего не требует. «Копнуть глубже» открывает наводящие вопросы; ответы вы сами записываете в мотивы, приложение ничего не сочиняет. Если несимпатичный мотив честно не находится, не выдумывайте его: правда - ни больше, ни меньше.</p>
 
       <p class="set-h">Перечитывание</p>
       <p>Спустя дни запись видится иначе. Полка «Пора перечитать» собирает записи старше выбранного срока без отметки. При перечитывании исходное не правится: можно дописать поздние мотивы (они получают метку), поставить отметку - запись была честной, не вполне, главного не увидел - и заметку. Перечитывать можно повторно.</p>
@@ -823,7 +833,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 'use strict';
 
 /* Версия приложения: дублируется в комментарии первой строки файла (п. 2.3) */
-var APP_VERSION = 'v1.6';
+var APP_VERSION = 'v1.7';
 
 function $(s, r){ return (r || document).querySelector(s); }
 function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -914,7 +924,7 @@ var MAX_ENTRIES = 20000;
 var MAX_MOTIVES = 20;
 function makeEntry(type){
   var now = new Date().toISOString();
-  return { id: uid(), type: type === 'judge' ? 'judge' : 'own', act: '', who: '',
+  return { id: uid(), type: type === 'judge' ? 'judge' : 'own', act: '', who: '', his: '',
     motives: [], review: '', reviewAt: '', reviewNote: '', createdAt: now, updatedAt: now };
 }
 function makeMotive(late){
@@ -1134,6 +1144,7 @@ compBk.addEventListener('click', function(e){ if (e.target === compBk){ closeLay
 
 /* ===== Помощник честности (п. 5.6): наборы вопросов по типу записи ===== */
 var DIG_OWN = [
+  'Восстановите картину по шагам: что предшествовало, какая была обстановка, что случилось - и в каком месте возник каждый мотив?',
   'Что я получил этим поступком?',
   'Чего я избежал?',
   'Как я хотел выглядеть в чужих и своих глазах?',
@@ -1361,7 +1372,7 @@ function entriesSorted(){
 }
 /* Поиск по act, who, мотивам и reviewNote (п. 4.3) */
 function entrySearchText(en){
-  var parts = [en.act || '', en.who || '', en.reviewNote || ''];
+  var parts = [en.act || '', en.who || '', en.his || '', en.reviewNote || ''];
   for (var i = 0; i < en.motives.length; i++){ parts.push(en.motives[i].text || ''); }
   return parts.join('\n').toLowerCase();
 }
@@ -1616,6 +1627,7 @@ function applyType(){
   $('#actLabel').textContent = ACT_LABEL[t];
   taAct.setAttribute('placeholder', ACT_PH[t]);
   $('#whoField').hidden = t !== 'judge';
+  $('#hisField').hidden = t !== 'judge';
 }
 /* Карточка мотива (п. 5.2): чипы "симпатичный | не очень" и "мышка", метка "дописан позже" */
 function motiveCard(m){
@@ -1698,6 +1710,12 @@ document.addEventListener('input', function(e){
     touch();
     return;
   }
+  if (t.id === 'taHis'){ /* понять его прежде, чем судить (Совет N 14) */
+    grow(t);
+    entry.his = t.value;
+    touch();
+    return;
+  }
   if (t.tagName === 'TEXTAREA' && t.getAttribute('data-mid')){
     grow(t);
     var f = findMotive(t.getAttribute('data-mid'));
@@ -1722,9 +1740,17 @@ document.addEventListener('click', function(e){
     touch();
     updateComp();
   } else if (chip.classList.contains('key')){
-    f.m.key = f.m.key !== true;
-    chip.classList.toggle('on', f.m.key);
-    chip.setAttribute('aria-pressed', f.m.key ? 'true' : 'false');
+    var kOn = f.m.key !== true;
+    if (kOn){ /* мышка одна - решающая гирька (вторая сверка, п. 8) */
+      for (var ki = 0; ki < entry.motives.length; ki++){ entry.motives[ki].key = false; }
+      $$('.mtv .chip.key.on').forEach(function(c){
+        c.classList.remove('on');
+        c.setAttribute('aria-pressed', 'false');
+      });
+    }
+    f.m.key = kOn;
+    chip.classList.toggle('on', kOn);
+    chip.setAttribute('aria-pressed', kOn ? 'true' : 'false');
     touch();
     updateComp();
   }
@@ -1786,6 +1812,7 @@ function enterEditor(en){
   quoteIdx++;
   applyType();
   inWho.value = en.who || '';
+  $('#taHis').value = en.his || '';
   taAct.value = en.act || '';
   renderMotives();
   renderRvBar();
@@ -1860,6 +1887,11 @@ function rvRender(){
     whoBox.hidden = false;
     $('#rvWho').textContent = entry.who;
   } else { whoBox.hidden = true; }
+  var hisBox = $('#rvHisBox');
+  if (entry.type === 'judge' && isText(entry.his)){
+    hisBox.hidden = false;
+    $('#rvHis').textContent = entry.his;
+  } else { hisBox.hidden = true; }
   var host = $('#rvMtvs');
   while (host.firstChild){ host.removeChild(host.firstChild); }
   var shown = 0;
@@ -1932,16 +1964,19 @@ function sanitizeEntry(raw){
   var e = makeEntry(raw.type === 'judge' ? 'judge' : 'own');
   if (typeof raw.act === 'string'){ e.act = raw.act.slice(0, 2000); }
   if (e.type === 'judge' && typeof raw.who === 'string'){ e.who = raw.who.slice(0, 120); }
+  if (e.type === 'judge' && typeof raw.his === 'string'){ e.his = raw.his.slice(0, 2000); }
   if (raw.motives !== undefined && !Array.isArray(raw.motives)){ throw new Error('мотивы'); }
   if (Array.isArray(raw.motives)){
     if (raw.motives.length > MAX_MOTIVES){ throw new Error('мотивы'); } /* лимит п. 3.4 - исключение */
+    var hasKey = false;
     for (var i = 0; i < raw.motives.length; i++){
       var rm = raw.motives[i];
       if (!rm || typeof rm !== 'object'){ continue; }
       var m = makeMotive(rm.late === true);
       if (typeof rm.text === 'string'){ m.text = rm.text.slice(0, 300); }
       m.kind = rm.kind === 'notnice' ? 'notnice' : 'nice';
-      m.key = rm.key === true;
+      m.key = rm.key === true && !hasKey; /* мышка одна (п. 8 сверки) */
+      if (m.key){ hasKey = true; }
       e.motives.push(m);
     }
   }
@@ -2040,6 +2075,9 @@ function buildMd(en){
   if (en.type === 'judge' && isText(en.who)){ lines.push('Кто: ' + flatLine(en.who)); }
   lines.push('');
   lines.push(ACT_LABEL[en.type] + ': ' + (isText(en.act) ? flatLine(en.act) : '(без описания)'));
+  if (en.type === 'judge' && isText(en.his)){
+    lines.push('Его причины и мотивы: ' + flatLine(en.his));
+  }
   lines.push('');
   lines.push('Мотивы:');
   var f = filledMotives(en);
@@ -2182,6 +2220,14 @@ function printEntryBlock(en){
   pa.appendChild(bm);
   pa.appendChild(document.createTextNode(isText(en.act) ? flatLine(en.act) : '(без описания)'));
   box.appendChild(pa);
+  if (en.type === 'judge' && isText(en.his)){
+    var ph = el('p');
+    var hm = el('span', 'pmark');
+    hm.textContent = 'Его причины и мотивы: ';
+    ph.appendChild(hm);
+    ph.appendChild(document.createTextNode(flatLine(en.his)));
+    box.appendChild(ph);
+  }
   var f = filledMotives(en);
   if (f.length){
     var ul = el('ul');
