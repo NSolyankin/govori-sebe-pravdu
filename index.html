@@ -1,0 +1,2571 @@
+<!-- Говори себе правду v1.3 | +меню карточки списка: удаление и перечитывание | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 117064 байт -->
+<!DOCTYPE html>
+<html lang="ru" data-theme="auto">
+<head>
+<meta charset="utf-8">
+<title>Говори себе правду</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F5F1">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#15171B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Правда себе">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232E6E5E'/%3E%3Cpath d='M9 6h14a3 3 0 0 1 3 3v8a3 3 0 0 1-3 3h-8l-5 4v-4H9a3 3 0 0 1-3-3V9a3 3 0 0 1 3-3z' fill='%23ffffff'/%3E%3Cpath d='M12 12.5l2.5 2.5L20 9.5' stroke='%232E6E5E' stroke-width='2.2' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+/* ===== Токены темы (п. 9 ТЗ): перенос из "А что потом?" v1.17.1, заменен только акцент (п. 9.1) ===== */
+:root{
+  color-scheme:light;
+  --bg:#F6F5F1;
+  --card:#FFFFFF;
+  --text:#20242A;
+  --text2:#6E7480;
+  --line:#E3E1DB;
+  --accent:#2E6E5E;
+  --plus:#2E7D52;
+  --plus-bg:rgba(46,125,82,0.08);
+  --minus:#C2563B;
+  --minus-bg:rgba(194,86,59,0.08);
+  --shadow:0 1px 2px rgba(0,0,0,0.06),0 4px 12px rgba(0,0,0,0.05);
+  --card-border:transparent;
+  --press:rgba(0,0,0,0.06);
+  --scrim:rgba(0,0,0,0.4);
+}
+html[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#15171B;
+  --card:#1E2127;
+  --text:#E8EAED;
+  --text2:#9AA1AC;
+  --line:#2C313A;
+  --accent:#7FC7B2;
+  --plus:#5BBF8C;
+  --plus-bg:rgba(91,191,140,0.12);
+  --minus:#E08568;
+  --minus-bg:rgba(224,133,104,0.12);
+  --shadow:0 1px 2px rgba(0,0,0,0.25);
+  --card-border:var(--line);
+  --press:rgba(255,255,255,0.08);
+  --scrim:rgba(0,0,0,0.55);
+}
+
+/* ===== База (перенос из исходника, п. 2.4) ===== */
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+html.locked,html.locked body{overflow:hidden}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  font-size:17px;
+  line-height:1.5;
+  -webkit-text-size-adjust:100%;
+}
+button{font:inherit;color:inherit;background:none;border:0;padding:0;margin:0;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+textarea{
+  display:block;width:100%;border:0;background:transparent;color:inherit;
+  font:inherit;resize:none;padding:0;margin:0;overflow:hidden;-webkit-appearance:none;appearance:none;
+}
+textarea::placeholder{color:var(--text2);opacity:0.8}
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:8px}
+[hidden]{display:none !important}
+hr{border:0;border-top:1px solid var(--line);margin:6px 4px}
+
+.icon{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+
+/* ===== Контейнер и шапка ===== */
+.wrap{
+  max-width:720px;margin:0 auto;
+  padding:16px;
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right));
+  padding-bottom:calc(24px + env(safe-area-inset-bottom));
+}
+.bar{
+  position:sticky;top:0;z-index:20;background:var(--bg);
+  border-bottom:1px solid var(--line);
+  padding-top:env(safe-area-inset-top);
+}
+.bar-in{
+  max-width:720px;margin:0 auto;display:flex;align-items:center;gap:2px;
+  min-height:52px;
+  padding:4px 8px;
+  padding-left:calc(8px + env(safe-area-inset-left));
+  padding-right:calc(8px + env(safe-area-inset-right));
+}
+.bar-title{flex:1;min-width:0;font-size:17px;font-weight:600;margin:0;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.iconbtn{
+  width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;
+  border-radius:12px;color:var(--text);
+}
+.iconbtn:active{background:var(--press)}
+
+/* ===== Кнопки ===== */
+.btn{
+  display:flex;align-items:center;justify-content:center;width:100%;
+  min-height:48px;border-radius:12px;padding:0 16px;font-weight:600;
+}
+.btn:active{filter:brightness(0.95)}
+.btn.primary{background:var(--accent);color:#FFFFFF}
+html[data-theme="dark"] .btn.primary{color:#15171B}
+.btn.ghost{color:var(--accent);min-height:44px}
+.btn-add{
+  flex:1;min-height:44px;border-radius:12px;border:1.5px solid currentColor;
+  background:transparent;font-weight:600;display:flex;align-items:center;justify-content:center;
+  color:var(--accent);
+}
+.btn-add:active{background:var(--press)}
+.addpair{display:flex;gap:10px}
+.addbar{
+  position:sticky;bottom:0;z-index:10;
+  margin:8px -4px 0;padding:12px 4px calc(10px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,var(--bg) 75%,transparent);
+}
+
+/* ===== Список записей (п. 4.3) ===== */
+.list-head{font-size:15px;font-weight:600;color:var(--text2);margin:16px 2px 12px}
+.doc{
+  display:block;
+  background:var(--card);border:1px solid var(--card-border);border-radius:14px;
+  box-shadow:var(--shadow);padding:12px 16px 12px;margin:0 0 12px;width:100%;text-align:left;
+}
+.doc-top{display:flex;align-items:center;gap:8px;font-size:12px}
+.badge{font-weight:700;letter-spacing:0.05em;text-transform:uppercase;font-size:11px;color:var(--accent)}
+.doc-mark{font-size:12px;color:var(--plus);font-weight:600;white-space:nowrap}
+.doc-top .sp{flex:1}
+.doc-kebab{width:36px;height:36px;margin:-6px -8px;color:var(--text2)}
+.doc-act{
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+  overflow:hidden;margin-top:2px;overflow-wrap:break-word;
+}
+.doc-act.empty{color:var(--text2)}
+.doc-meta{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);margin-top:6px}
+.doc-meta .sp{flex:1}
+.doc-rv{color:var(--accent);font-weight:600;font-size:13px;padding:6px 0;position:relative}
+.doc-rv::after{content:"";position:absolute;inset:-8px} /* тап-зона от 44px */
+.np{color:var(--plus);font-weight:600}
+.nm{color:var(--minus);font-weight:600}
+.storenote{font-size:13px;color:var(--text2);text-align:center;margin:24px 0 0}
+
+.quote{margin:56px 12px 28px;text-align:center}
+.quote blockquote{margin:0 0 10px;font-size:19px;font-weight:600;line-height:1.4}
+.quote figcaption{font-size:13px;color:var(--text2)}
+
+/* Полка "Пора перечитать" (п. 4.3) */
+.shelf{
+  background:var(--card);border:1px solid var(--accent);border-radius:14px;
+  box-shadow:var(--shadow);padding:10px 14px 12px;margin:0 0 14px;
+}
+.shelf-title{font-size:13px;font-weight:700;color:var(--accent);margin:2px 0 2px}
+.shelf-item{display:flex;align-items:center;gap:10px;width:100%;text-align:left;min-height:46px;font-size:15px;border-top:1px solid var(--line)}
+.shelf-item:first-of-type{border-top:0}
+.shelf-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.shelf-days{font-size:12px;color:var(--text2);white-space:nowrap}
+.shelf-item:active{background:var(--press)}
+.shelf-more{font-size:13px;color:var(--text2);margin-top:6px}
+
+/* Поиск и фильтры (п. 4.3) */
+.searchbar{display:flex;align-items:center;gap:8px;margin:0 0 12px;flex-wrap:wrap}
+.searchbar input{flex:1;min-width:150px;font-size:14px;padding:8px 11px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--text)}
+.searchbar input::placeholder{color:var(--text2)}
+.lsort{font-size:12px;border-radius:10px;padding:8px 9px;border:1px solid var(--line);background:var(--card);color:var(--text2)}
+.sortbtn{font-size:12px;line-height:1;border-radius:999px;padding:8px 11px;border:1px solid var(--line);background:var(--card);color:var(--text2);cursor:pointer;white-space:nowrap}
+.sortbtn:active{background:var(--press)}
+.sortbtn.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+html[data-theme="dark"] .sortbtn.on{color:#15171B}
+
+/* ===== Редактор записи (п. 5) ===== */
+.typeseg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:0 0 12px}
+.typeseg button{flex:1;min-height:44px;font-size:15px;color:var(--text2)}
+.typeseg button + button{border-left:1px solid var(--line)}
+.typeseg button.active{background:var(--accent);color:#FFFFFF;font-weight:600}
+html[data-theme="dark"] .typeseg button.active{color:#15171B}
+.decision{
+  background:var(--card);border:1.5px solid var(--accent);border-radius:14px;
+  box-shadow:var(--shadow);padding:12px 16px 14px;
+}
+.decision-label{font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:4px}
+.decision textarea{font-size:19px;font-weight:600;line-height:1.4}
+.titlefield{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 16px 12px;margin-bottom:10px}
+.titlefield input{width:100%;border:none;background:transparent;color:var(--text);font-size:17px;font-weight:600;padding:0;outline:none}
+.titlefield input::placeholder{color:var(--text2);font-weight:400}
+.balance{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;font-size:13px}
+.pill{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--card);border:1px solid var(--line);border-radius:999px;
+  padding:5px 12px;color:var(--text2);
+}
+.pill.comp{color:var(--accent);cursor:pointer}
+.hint{
+  font-size:14px;color:var(--text2);
+  border:1px dashed var(--line);border-radius:12px;
+  padding:10px 14px;margin:0 0 12px;
+}
+.digbtn{display:block;width:100%;margin:0 0 12px;padding:10px 12px;font-size:14px;text-align:left;
+  border:1px dashed var(--accent);border-radius:12px;background:transparent;color:var(--accent);cursor:pointer}
+.digbtn:active{background:var(--press)}
+
+/* Карточка мотива (п. 5.2): nice - токен plus, notnice - токен minus */
+.mtv{
+  position:relative;
+  background-color:var(--card);
+  background-image:linear-gradient(var(--sgnbg),var(--sgnbg));
+  border:1px solid var(--card-border);border-radius:14px;
+  box-shadow:var(--shadow),inset 3px 0 0 0 var(--sgn);
+  padding:10px 12px 10px 15px;margin:0 0 10px;
+  animation:cardin 180ms ease-out both;
+}
+.mtv.nice{--sgn:var(--plus);--sgnbg:var(--plus-bg)}
+.mtv.notnice{--sgn:var(--minus);--sgnbg:var(--minus-bg)}
+@keyframes cardin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+.mtv-top{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.mtv-top .sp{flex:1}
+.chip{
+  position:relative;font-size:13px;line-height:1;border-radius:999px;
+  padding:6px 11px;background:var(--card);
+}
+.chip::after{content:"";position:absolute;inset:-8px;border-radius:999px} /* тап-зона от 44px */
+.chip:active{background:var(--press)}
+.chip.kind{font-weight:700;color:var(--sgn);border:1px solid var(--sgn)}
+.chip.key{color:var(--text2);border:1px solid var(--line)}
+.chip.key.on{color:#fff;background:var(--accent);border-color:var(--accent);font-weight:700}
+html[data-theme="dark"] .chip.key.on{color:#15171B}
+.latechip{font-size:11px;color:var(--text2);border:1px dashed var(--line);border-radius:999px;padding:4px 8px;white-space:nowrap}
+.mtv textarea{margin:8px 0 2px}
+.mtv .iconbtn{width:40px;height:40px;margin:-6px -4px -6px 0;color:var(--text2)}
+
+/* Плашка перечитанной записи в редакторе (п. 6) */
+.reviewbar{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0 0 14px}
+.rb-title{font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px}
+.rb-note{font-size:14px;color:var(--text);white-space:pre-wrap;overflow-wrap:break-word;margin:4px 0 2px}
+.rb-again{color:var(--accent);font-weight:600;font-size:14px;min-height:40px;padding:0;margin-top:2px}
+
+/* ===== Перечитывание (п. 6): слой поверх редактора ===== */
+.rv{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch}
+.rv-head{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+.rv-head-in{
+  max-width:720px;margin:0 auto;display:flex;align-items:center;gap:8px;min-height:52px;
+  padding:4px 12px;
+  padding-left:calc(12px + env(safe-area-inset-left));
+  padding-right:calc(12px + env(safe-area-inset-right));
+}
+.rv-title{flex:1;min-width:0;font-weight:600;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rv-act{color:var(--accent);font-weight:600;min-height:44px;padding:0 8px;border-radius:10px;flex:0 0 auto}
+.rv-act:active{background:var(--press)}
+.rv-wrap{
+  max-width:720px;margin:0 auto;padding:16px;
+  padding-left:calc(16px + env(safe-area-inset-left));
+  padding-right:calc(16px + env(safe-area-inset-right));
+  padding-bottom:calc(40px + env(safe-area-inset-bottom));
+}
+.ro{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin:0 0 12px}
+.ro-label{font-size:11px;font-weight:700;letter-spacing:0.08em;color:var(--text2);text-transform:uppercase;margin-bottom:4px}
+.ro-text{white-space:pre-wrap;overflow-wrap:break-word}
+.ro-text.empty{color:var(--text2)}
+.ro-mtv{display:flex;align-items:baseline;gap:8px;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.ro-mtv:first-of-type{border-top:0}
+.ro-kind{font-weight:700;white-space:nowrap;font-size:13px}
+.ro-kind.nice{color:var(--plus)}
+.ro-kind.notnice{color:var(--minus)}
+.ro-mtxt{flex:1;min-width:0;overflow-wrap:break-word}
+.ro-flags{font-size:12px;color:var(--text2);white-space:nowrap}
+.rv-sec{font-size:13px;font-weight:700;color:var(--text2);margin:16px 2px 8px}
+.rvseg{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.rvseg button{border:1px solid var(--line);border-radius:999px;padding:9px 14px;background:var(--card);font-size:14px;color:var(--text2)}
+.rvseg button:active{background:var(--press)}
+.rvseg button.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+html[data-theme="dark"] .rvseg button.on{color:#15171B}
+.rv-addrow{display:flex;margin:0 0 14px}
+
+/* ===== Настройки и справка ===== */
+.setdlg{max-width:460px;width:100%;max-height:min(84vh,680px);overflow:auto;text-align:left}
+.set-title{font-weight:600;font-size:17px;margin:0 0 14px}
+.set-row{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;justify-content:space-between;margin:0 0 16px}
+.set-label{font-size:15px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{padding:7px 12px;font-size:14px;color:var(--text2)}
+.seg button + button{border-left:1px solid var(--line)}
+.seg button.active{background:var(--accent);color:#FFFFFF;font-weight:600}
+html[data-theme="dark"] .seg button.active{color:#15171B}
+.set-about{border-top:1px solid var(--line);padding-top:12px}
+.set-h{font-weight:600;margin:14px 0 6px;font-size:15px}
+.set-about p{margin:0 0 10px;font-size:14px;line-height:1.55}
+.set-about .sub{color:var(--text2);margin-top:14px}
+.set-about .lnk{color:var(--accent);word-break:break-all;font-size:14px}
+.snapbar{display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;justify-content:space-between;background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:12px 14px;margin:0 0 14px;box-shadow:var(--shadow)}
+.snapbar p{margin:0;font-size:15px;line-height:1.4}
+
+/* ===== Листы, диалоги, поповеры, тост, плашка (перенос, п. 2.4) ===== */
+.layer-bk{position:fixed;inset:0;z-index:50;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+.layer-bk.center{align-items:center;padding:24px;z-index:60}
+.sheet{
+  width:100%;max-width:560px;background:var(--card);
+  border-radius:18px 18px 0 0;
+  padding:8px 16px calc(12px + env(safe-area-inset-bottom));
+  box-shadow:0 -8px 32px rgba(0,0,0,0.18);
+  max-height:min(84vh,640px);overflow:auto;
+}
+.handle{width:36px;height:4px;border-radius:2px;background:var(--line);margin:4px auto 6px}
+.sheet h2{font-size:16px;font-weight:600;margin:6px 2px 4px}
+.sheet .row{
+  display:flex;align-items:center;gap:12px;width:100%;
+  min-height:52px;font-size:16px;text-align:left;border-top:1px solid var(--line);
+}
+.sheet .row:first-of-type{border-top:0}
+.sheet .row .icon{color:var(--accent)}
+.sheet .row:active{background:var(--press)}
+.comp-row{display:flex;align-items:flex-start;gap:10px;padding:11px 2px;border-top:1px solid var(--line);font-size:15px}
+.comp-row:first-child{border-top:0}
+.comp-row .comp-mark{flex:0 0 auto;width:20px;text-align:center;font-weight:700;color:var(--text2)}
+.comp-row.done .comp-mark{color:var(--plus)}
+.comp-row .comp-txt{color:var(--text2)}
+.comp-row.done .comp-txt{color:var(--text)}
+.dig-note{font-size:13px;color:var(--text2);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin:8px 0 4px}
+.dig-q{padding:11px 2px;border-top:1px solid var(--line);font-size:15px;margin:0}
+.dig-q:first-of-type{border-top:0}
+.st-grid{display:grid;grid-template-columns:1fr auto auto;gap:7px 16px;font-size:14px;align-items:baseline;padding:6px 2px 10px}
+.st-h{font-size:12px;color:var(--text2);font-weight:600;text-align:right}
+.st-l{color:var(--text)}
+.st-v{text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+
+.dlg{
+  background:var(--card);border:1px solid var(--card-border);border-radius:14px;
+  box-shadow:var(--shadow);padding:18px 18px 10px;max-width:340px;width:100%;
+}
+.dlg p{margin:0 0 10px;font-size:16px}
+.dlg .sub{font-size:14px;color:var(--text2)}
+.dlg-btns{display:flex;justify-content:flex-end;gap:4px;margin-top:6px;flex-wrap:wrap}
+.dlg-btn{min-height:44px;padding:0 14px;font-weight:600;border-radius:10px;color:var(--accent)}
+.dlg-btn:active{background:var(--press)}
+.dlg-btn.danger{color:var(--minus)}
+
+.pop-bk{position:fixed;inset:0;z-index:54;background:transparent}
+.pop{
+  position:fixed;z-index:55;min-width:230px;max-width:300px;
+  background:var(--card);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 8px 28px rgba(0,0,0,0.16);padding:6px;
+}
+.pop button{
+  display:flex;align-items:center;gap:10px;width:100%;
+  min-height:44px;padding:0 10px;border-radius:8px;font-size:15px;text-align:left;
+}
+.pop button:active{background:var(--press)}
+.pop button .icon{color:var(--text2)}
+.pop .danger,.pop .danger .icon{color:var(--minus)}
+
+#toast{
+  position:fixed;left:50%;bottom:calc(16px + env(safe-area-inset-bottom));z-index:70;
+  transform:translateX(-50%) translateY(8px);
+  background:#262B33;color:#F2F4F7;border-radius:12px;
+  padding:10px 14px;display:flex;align-items:center;gap:14px;
+  box-shadow:0 4px 16px rgba(0,0,0,0.25);font-size:15px;
+  max-width:min(92vw,480px);
+  opacity:0;pointer-events:none;
+  transition:opacity 180ms ease-out,transform 180ms ease-out;
+}
+#toast.show{opacity:1;pointer-events:auto;transform:translateX(-50%) translateY(0)}
+#toast button{color:#8FDCC4;font-weight:700;min-height:36px;padding:0 4px;white-space:nowrap}
+
+#bannerTg{
+  position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));z-index:65;
+  max-width:560px;margin:0 auto;
+  background:var(--card);border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);padding:12px 14px;
+  display:flex;align-items:center;gap:12px;
+}
+#bannerTg p{flex:1;margin:0;font-size:14px}
+#bannerTg button{color:var(--accent);font-weight:600;min-height:44px;padding:0 8px;border-radius:10px}
+
+/* ===== Заслон: код на вход (не шифрование, защита от случайного взгляда) ===== */
+.lockscr{position:fixed;inset:0;z-index:90;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.lock-in{width:100%;max-width:280px;text-align:center}
+.lock-title{font-weight:600;margin-bottom:14px}
+.lock-dots{display:flex;justify-content:center;gap:14px;min-height:14px;margin-bottom:22px}
+.lock-dot{width:12px;height:12px;border-radius:50%;border:1.5px solid var(--text2)}
+.lock-dot.on{background:var(--accent);border-color:var(--accent)}
+.lock-dots.err .lock-dot{border-color:var(--minus)}
+.lock-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;justify-items:center}
+.lock-key{width:72px;height:72px;border-radius:50%;background:var(--card);border:1px solid var(--line);font-size:26px;font-weight:600;display:flex;align-items:center;justify-content:center}
+.lock-key:active{background:var(--press)}
+.lock-key.ghost{background:none;border:none;font-size:22px;color:var(--text2)}
+.lock-bio{margin-top:18px;color:var(--accent);font-weight:600;min-height:44px;padding:0 10px;border-radius:10px}
+.lock-note{font-size:13px;color:var(--text2);margin-top:10px;min-height:20px}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important;transition:none !important}
+}
+
+/* ===== Печать (п. 7.4): только содержимое, черным по белому, поля 15 мм ===== */
+#printView{display:none}
+@page{margin:15mm}
+@media print{
+  html,body{background:#fff !important}
+  body > *{display:none !important}
+  #printView{display:block !important;color:#000;background:#fff;font-size:12pt;line-height:1.45}
+  #printView h1{font-size:16pt;margin:0 0 4pt;color:#000}
+  #printView .pentry{margin:0 0 14pt;page-break-inside:avoid}
+  #printView .pdate{margin:0 0 6pt;font-size:11pt;color:#000}
+  #printView p{margin:0 0 4pt}
+  #printView ul{margin:0 0 4pt;padding-left:16pt;list-style:none}
+  #printView li{margin:0 0 3pt}
+  #printView .pmark{font-weight:700}
+}
+</style>
+</head>
+<body>
+
+<!-- Спрайт иконок: однотонные, линия 1.75px (перенос стиля исходника) -->
+<svg hidden xmlns="http://www.w3.org/2000/svg">
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7"/></symbol>
+  <symbol id="i-dots" viewBox="0 0 24 24"><g fill="currentColor" stroke="none"><circle cx="12" cy="5" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="12" cy="19" r="1.6"/></g></symbol>
+  <symbol id="i-export" viewBox="0 0 24 24"><path d="M8 7l4-4 4 4"/><path d="M12 3v12"/><path d="M5 12v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16"/><path d="M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><path d="M6 7l1 13h10l1-13"/><path d="M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+  <symbol id="i-set" viewBox="0 0 24 24"><path d="M4 7h9M19 7h1M4 12h3M13 12h7M4 17h11"/><circle cx="15.5" cy="7" r="2.2"/><circle cx="9.5" cy="12" r="2.2"/><circle cx="17.5" cy="17" r="2.2"/></symbol>
+  <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 8V4h10v4"/><rect x="4" y="8" width="16" height="8" rx="2"/><path d="M7 13h10v7H7z"/></symbol>
+  <symbol id="i-sum" viewBox="0 0 24 24"><path d="M5 20V10M12 20V4M19 20v-7"/></symbol>
+</svg>
+
+<!-- ===== Экран: Мои записи (п. 4.2-4.3) ===== -->
+<section id="scrList" data-screen>
+  <header class="bar">
+    <div class="bar-in">
+      <h1 class="bar-title">Говори себе правду</h1>
+      <button class="iconbtn" id="btnSettings" aria-label="Настройки"><svg class="icon"><use href="#i-set"/></svg></button>
+      <button class="iconbtn" id="btnListMenu" aria-label="Меню списка"><svg class="icon"><use href="#i-dots"/></svg></button>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="snapbar" id="storeWarn" hidden><p></p></div>
+    <div class="snapbar" id="tabBarL" hidden>
+      <p>Данные изменены в другой вкладке</p>
+      <button class="btn primary" id="tabReload">Обновить</button>
+    </div>
+
+    <div id="listFull">
+      <!-- Полка "Пора перечитать" (п. 4.3): записи старше reviewDays без отметки -->
+      <div class="shelf" id="shelf" hidden>
+        <div class="shelf-title">Пора перечитать</div>
+        <div id="shelfItems"></div>
+        <div class="shelf-more" id="shelfMore" hidden></div>
+      </div>
+
+      <div class="searchbar">
+        <input type="search" id="listSearch" placeholder="Поиск по записям" autocomplete="off" aria-label="Поиск">
+        <select id="typeSel" class="lsort" aria-label="Тип записей">
+          <option value="all">все</option>
+          <option value="own">свои</option>
+          <option value="judge">чужие</option>
+        </select>
+        <button type="button" class="sortbtn" id="unrevBtn" aria-pressed="false">Неперечитанные</button>
+      </div>
+
+      <!-- Лента: строит renderList из хранилища, группировка по дням -->
+      <div id="entryList"></div>
+    </div>
+
+    <div id="listEmpty" hidden>
+      <figure class="quote">
+        <blockquote></blockquote>
+        <figcaption></figcaption>
+      </figure>
+    </div>
+
+    <div class="addbar">
+      <div class="addpair">
+        <button class="btn-add" data-new="own">+ Свой поступок</button>
+        <button class="btn-add" data-new="judge">+ Чужой поступок</button>
+      </div>
+    </div>
+
+    <p class="storenote">Записи хранятся в этом браузере. Берегите архив: выгружайте .json</p>
+  </main>
+</section>
+
+<!-- ===== Экран: Редактор записи (п. 5) ===== -->
+<section id="scrEditor" data-screen hidden>
+  <header class="bar">
+    <div class="bar-in">
+      <button class="iconbtn" id="btnBack" aria-label="Назад к списку"><svg class="icon"><use href="#i-back"/></svg></button>
+      <h1 class="bar-title" id="edTitle">Запись</h1>
+      <button class="iconbtn" id="btnExport" aria-label="Экспорт"><svg class="icon"><use href="#i-export"/></svg></button>
+      <button class="iconbtn" id="btnEdMenu" aria-label="Меню записи"><svg class="icon"><use href="#i-dots"/></svg></button>
+    </div>
+  </header>
+  <main class="wrap" id="editor">
+    <div class="snapbar" id="storeWarnEd" hidden><p></p></div>
+    <div class="snapbar" id="tabBar" hidden>
+      <p>Данные изменены в другой вкладке. Правки здесь не сохранятся</p>
+      <button class="btn primary" id="tabExp">Выгрузить .json</button>
+      <button class="btn ghost" id="tabReload2">Обновить</button>
+    </div>
+
+    <!-- Переключатель типа (п. 5.1): для оценки появляется поле "Кто" -->
+    <div class="typeseg" id="typeSeg" role="group" aria-label="Тип записи">
+      <button data-type-opt="own">Свой поступок</button>
+      <button data-type-opt="judge">Чужой поступок</button>
+    </div>
+
+    <section class="titlefield" id="whoField" hidden>
+      <div class="decision-label">Кто</div>
+      <input type="text" id="inWho" maxlength="120" autocomplete="off" placeholder="Человек или роль (необязательно)">
+    </section>
+
+    <section class="decision">
+      <div class="decision-label" id="actLabel">Поступок</div>
+      <textarea id="taAct" rows="1" maxlength="2000" placeholder="Что я сделал или решил?"></textarea>
+    </section>
+
+    <div class="balance">
+      <span class="pill" id="mtvCount">мотивов пока нет</span>
+      <button type="button" class="pill comp" id="compPill" aria-label="Полнота записи, подробнее">полнота 0 из 5</button>
+    </div>
+
+    <!-- Подсказка-цитата (п. 5.5): отключаема настройкой quotes -->
+    <p class="hint" id="hintLine" hidden></p>
+
+    <!-- Плашка перечитанной записи (п. 6.3) -->
+    <div class="reviewbar" id="rvBar" hidden>
+      <div class="rb-title" id="rvBarTitle"></div>
+      <div class="rb-note" id="rvBarNote" hidden></div>
+      <button type="button" class="rb-again" id="btnRvAgain">Перечитать снова</button>
+    </div>
+
+    <!-- Мотивы: строит renderMotives, ввод без перерендера списка (п. 5.3) -->
+    <div id="mtvList"></div>
+
+    <!-- Помощник честности (п. 5.6) -->
+    <button type="button" class="digbtn" id="btnDig">Копнуть глубже: наводящие вопросы</button>
+
+    <div class="addbar">
+      <div class="addpair">
+        <button class="btn-add" id="btnAddMtv">+ Добавить мотив</button>
+      </div>
+    </div>
+  </main>
+</section>
+
+<!-- ===== Слой: Перечитывание (п. 6): исходное только для чтения ===== -->
+<div class="rv" id="rvw" hidden>
+  <div class="rv-head">
+    <div class="rv-head-in">
+      <button class="rv-act" id="rvClose">Закрыть</button>
+      <div class="rv-title">Перечитывание</div>
+      <button class="rv-act" id="rvSave">Сохранить</button>
+    </div>
+  </div>
+  <div class="rv-wrap">
+    <p class="hint">Не оправдываться и не казнить себя: точно, как есть, ни больше, ни меньше</p>
+    <div class="ro">
+      <div class="ro-label" id="rvActLabel">Поступок</div>
+      <div class="ro-text" id="rvAct"></div>
+    </div>
+    <div class="ro" id="rvWhoBox" hidden>
+      <div class="ro-label">Кто</div>
+      <div class="ro-text" id="rvWho"></div>
+    </div>
+    <div class="ro">
+      <div class="ro-label">Мотивы</div>
+      <div id="rvMtvs"></div>
+    </div>
+    <!-- Поздние мотивы этой сессии: редактируемы, получают late=true (п. 6.2) -->
+    <div id="rvNewList"></div>
+    <div class="rv-addrow">
+      <button type="button" class="btn-add" id="rvAddMtv">+ Дописать мотив</button>
+    </div>
+    <div class="rv-sec">Какой была запись?</div>
+    <div class="rvseg" id="rvSeg" role="group" aria-label="Отметка перечитывания">
+      <button data-rv-opt="honest">честной</button>
+      <button data-rv-opt="partly">не вполне</button>
+      <button data-rv-opt="blind">главного не увидел</button>
+    </div>
+    <section class="decision">
+      <div class="decision-label">Заметка</div>
+      <textarea id="taRvNote" rows="1" maxlength="2000" placeholder="Что увиделось при перечитывании (необязательно)"></textarea>
+    </section>
+  </div>
+</div>
+
+<!-- ===== Лист: Экспорт записи (п. 7.3-7.4) ===== -->
+<div class="layer-bk" id="sheetBk" hidden>
+  <div class="sheet" role="dialog" aria-label="Экспорт записи">
+    <div class="handle"></div>
+    <h2>Экспорт записи</h2>
+    <button class="row" id="btnExpMd"><svg class="icon"><use href="#i-export"/></svg>Поделиться .md</button>
+    <button class="row" id="btnExpNotes"><svg class="icon"><use href="#i-copy"/></svg>Скопировать для Заметок</button>
+    <button class="row" id="btnExpObsidian"><svg class="icon"><use href="#i-export"/></svg>Сохранить в Obsidian</button>
+    <button class="row" id="btnExpPrint"><svg class="icon"><use href="#i-print"/></svg>Печать записи</button>
+  </div>
+</div>
+
+<!-- ===== Лист: Полнота записи (п. 5.4) ===== -->
+<div class="layer-bk" id="compBk" hidden>
+  <div class="sheet" role="dialog" aria-label="Полнота записи">
+    <div class="handle"></div>
+    <h2>Полнота записи</h2>
+    <div id="compList"></div>
+  </div>
+</div>
+
+<!-- ===== Лист: Помощник честности (п. 5.6) ===== -->
+<div class="layer-bk" id="digBk" hidden>
+  <div class="sheet" role="dialog" aria-label="Копнуть глубже">
+    <div class="handle"></div>
+    <h2>Копнуть глубже</h2>
+    <p class="dig-note">Не оправдываться и не казнить себя: точно, как есть, ни больше, ни меньше</p>
+    <div id="digList"></div>
+  </div>
+</div>
+
+<!-- ===== Лист: Итоги (п. 7.1) ===== -->
+<div class="layer-bk" id="statsBk" hidden>
+  <div class="sheet" role="dialog" aria-label="Итоги">
+    <div class="handle"></div>
+    <h2>Итоги</h2>
+    <div class="st-grid" id="stGrid"></div>
+  </div>
+</div>
+
+<!-- ===== Диалог подтверждения ===== -->
+<div class="layer-bk center" id="dlgBk" hidden>
+  <div class="dlg" role="alertdialog" aria-labelledby="dlgText">
+    <p id="dlgText">Удалить запись?</p>
+    <div class="dlg-btns">
+      <button class="dlg-btn" id="dlgCancel">Отмена</button>
+      <button class="dlg-btn danger" id="dlgOk">Удалить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Диалог загрузки архива (п. 7.2): объединить или заменить ===== -->
+<div class="layer-bk center" id="impBk" hidden>
+  <div class="dlg" role="alertdialog" aria-labelledby="impText">
+    <p id="impText"></p>
+    <p class="sub">Объединить: добавить к текущим записям. Заменить: текущие записи будут удалены</p>
+    <div class="dlg-btns">
+      <button class="dlg-btn" id="impCancel">Отмена</button>
+      <button class="dlg-btn danger" id="impReplace">Заменить</button>
+      <button class="dlg-btn" id="impMerge">Объединить</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Диалог: Настройки и справка (п. 8.2) ===== -->
+<div class="layer-bk center" id="aboutBk" hidden>
+  <div class="dlg setdlg" role="dialog" aria-labelledby="aboutTitle">
+    <p id="aboutTitle" class="set-title">Настройки</p>
+
+    <div class="set-row">
+      <div class="set-label">Тема оформления</div>
+      <div class="seg" id="themeSeg" role="group" aria-label="Тема оформления">
+        <button data-theme-opt="auto">Авто</button>
+        <button data-theme-opt="light">Светлая</button>
+        <button data-theme-opt="dark">Темная</button>
+      </div>
+    </div>
+
+    <div class="set-row">
+      <div class="set-label">Подсказки-цитаты</div>
+      <div class="seg" id="quoteSeg" role="group" aria-label="Подсказки">
+        <button data-quote-opt="on">Вкл</button>
+        <button data-quote-opt="off">Выкл</button>
+      </div>
+    </div>
+
+    <div class="set-row">
+      <div class="set-label">Перечитывать через, дней</div>
+      <div class="seg" id="daysSeg" role="group" aria-label="Срок перечитывания">
+        <button data-days-opt="3">3</button>
+        <button data-days-opt="7">7</button>
+        <button data-days-opt="14">14</button>
+        <button data-days-opt="30">30</button>
+      </div>
+    </div>
+
+    <div class="set-row">
+      <div class="set-label">Код на вход</div>
+      <div class="seg">
+        <button id="btnLockSet">Задать</button>
+        <button id="btnLockChange" hidden>Сменить</button>
+        <button id="btnLockOff" hidden>Выкл</button>
+      </div>
+    </div>
+
+    <div class="set-row" id="bioRow" hidden>
+      <div class="set-label">Вход по Face ID</div>
+      <div class="seg" id="bioSeg" role="group" aria-label="Face ID">
+        <button data-bio-opt="on">Вкл</button>
+        <button data-bio-opt="off">Выкл</button>
+      </div>
+    </div>
+
+    <div class="set-row" id="bkRow" hidden>
+      <div class="set-label" id="bkLbl"></div>
+      <div class="seg">
+        <button id="btnBkDown">Выгрузить</button>
+        <button id="btnBkRestore">Восстановить</button>
+        <button id="btnBkDel">Удалить</button>
+      </div>
+    </div>
+
+    <div class="set-about">
+      <p class="set-h">О приложении «Говори себе правду»</p>
+      <p>Личный дневник мотивов по второй ценности Таллинской школы менеджеров. Запись фиксирует поступок или оценку чужого поступка и всю комбинацию мотивов за ними: и симпатичных, и не очень. Пара к приложению «А что потом?»: то смотрит вперед, на последствия решения, это - назад, на мотивы поступка.</p>
+
+      <p class="set-h">Зачем говорить себе правду</p>
+      <p>Цель практики - адекватная картина мира: находить нестыковки между своей схемой лабиринта и реальностью, различать пустое и твердое. Боль от найденной ошибки превращается в «радость неудачи»: карта стала точнее. Практика ежедневна: это терпеливая работа по обучению подсознания, а не разовый акт.</p>
+
+      <p class="set-h">Две крайности</p>
+      <p>От правды уводят два пути: чрезмерно себя оправдывать и чрезмерно себя казнить. Это два способа ухода от одной и той же правды. Задача - сказать себе правду точно, как она есть, ни больше, ни меньше. Тексты приложения намеренно не подталкивают ни к тому, ни к другому.</p>
+
+      <p class="set-h">«Мышка» из репки</p>
+      <p>Человек охотно осознает сильные и этичные мотивы и легендирует прошлое, забывая слабые и неэтичные. Но как в сказке о репке, без мышки - самого слабого участника - результата бы не было: подлинная причина поступка нередко скрыта в «не главных» мотивах. Отметка «мышка» на мотиве значит: без него поступок или оценка не состоялись бы.</p>
+
+      <p class="set-h">Алиби для самого себя</p>
+      <p>«Я сделал все, что мог» - выбор психологического комфорта вместо результата. Алиби надо не искать, а замечать. Вопросы помощника «Копнуть глубже» помогают заметить его вовремя.</p>
+
+      <p class="set-h">Оценка чужих поступков</p>
+      <p>Меньше осуждай чужое поведение, больше спрашивай о его причинах и мотивах. Сначала понять - потом решать, осуждать ли. Понимание не означает обязательного прощения. Для таких записей есть отдельный тип «Чужой поступок» со своим набором наводящих вопросов.</p>
+
+      <p class="set-h">Запись и мотивы</p>
+      <p>Опишите поступок или оценку, затем добавляйте мотивы. У мотива два свойства: «симпатичный | не очень» и отметка «мышка». Индикатор полноты подсказывает пять шагов честной записи, но ничего не требует. «Копнуть глубже» открывает наводящие вопросы; ответы вы сами записываете в мотивы, приложение ничего не сочиняет.</p>
+
+      <p class="set-h">Перечитывание</p>
+      <p>Спустя дни запись видится иначе. Полка «Пора перечитать» собирает записи старше выбранного срока без отметки. При перечитывании исходное не правится: можно дописать поздние мотивы (они получают метку), поставить отметку - запись была честной, не вполне, главного не увидел - и заметку. Перечитывать можно повторно.</p>
+
+      <p class="set-h">Хранение</p>
+      <p>Записи хранятся только в этом браузере на этом устройстве: сервера, сети и регистрации нет. Очистка данных браузера удалит записи: регулярно выгружайте архив .json. Перенос на другое устройство - только файлом архива; ссылки-снимка здесь нет намеренно.</p>
+
+      <p class="set-h">Приватность</p>
+      <p>Записи откровенные и предназначены только автору. Поставьте код-пароль на устройство. Будьте осмотрительны с выгруженными файлами и распечатками: удаляйте их из мессенджеров и общих папок, когда перенос завершен.</p>
+
+      <p class="set-h">Код на вход и Face ID</p>
+      <p>В настройках можно задать код из четырех цифр и, где доступно, вход по Face ID. Это заслон от случайного взгляда, а не шифрование: записи в хранилище остаются открытым текстом, настоящую защиту дает код-пароль самого устройства. Забытый код снять нельзя - поможет только очистка данных сайта вместе с записями, поэтому регулярно выгружайте архив.</p>
+
+      <p class="set-h">Советы для iPhone</p>
+      <p>Добавьте страницу на экран «Домой» (Поделиться, затем «На экран Домой»): она запускается как приложение и получает отдельное от Safari хранилище, которое не подпадает под семидневную очистку неиспользуемых сайтов. Выберите одно место для записей, а переносите их архивом .json. Удаление значка с экрана «Домой» удаляет и данные: сначала выгрузите архив.</p>
+
+      <p class="sub" id="quotaLine"></p>
+      <p class="sub" id="aboutVer">Версия</p>
+      <p class="lnk">https://github.com/NSolyankin/govori-sebe-pravdu</p>
+    </div>
+
+    <div class="dlg-btns">
+      <button class="dlg-btn" id="aboutOk">Закрыть</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Поповеры меню ===== -->
+<div class="pop-bk" id="popBk" hidden></div>
+
+<div class="pop" id="popMain" hidden>
+  <button id="miStats"><svg class="icon"><use href="#i-sum"/></svg>Итоги</button>
+  <hr>
+  <button id="miImport"><svg class="icon"><use href="#i-down"/></svg>Загрузить архив .json</button>
+  <button id="miExpAll"><svg class="icon"><use href="#i-export"/></svg>Выгрузить архив .json</button>
+  <button id="miObsAll"><svg class="icon"><use href="#i-export"/></svg>В Obsidian: видимые записи</button>
+  <button id="miPrintAll"><svg class="icon"><use href="#i-print"/></svg>Печать ленты</button>
+</div>
+
+<div class="pop" id="popEd" hidden>
+  <button id="miReread"><svg class="icon"><use href="#i-check"/></svg>Перечитать</button>
+  <hr>
+  <button class="danger" id="miDelEntry"><svg class="icon"><use href="#i-trash"/></svg>Удалить запись</button>
+</div>
+
+<div class="pop" id="popEntry" hidden>
+  <button id="miEntryReread"><svg class="icon"><use href="#i-check"/></svg>Перечитать</button>
+  <button class="danger" id="miEntryDel"><svg class="icon"><use href="#i-trash"/></svg>Удалить запись</button>
+</div>
+
+<!-- ===== Заслон: код на вход (не шифрование) ===== -->
+<div class="lockscr" id="lockScr" hidden>
+  <div class="lock-in">
+    <div class="lock-title" id="lockTitle">Введите код</div>
+    <div class="lock-dots" id="lockDots">
+      <span class="lock-dot"></span><span class="lock-dot"></span><span class="lock-dot"></span><span class="lock-dot"></span>
+    </div>
+    <div class="lock-pad" id="lockPad">
+      <button class="lock-key" data-k="1">1</button>
+      <button class="lock-key" data-k="2">2</button>
+      <button class="lock-key" data-k="3">3</button>
+      <button class="lock-key" data-k="4">4</button>
+      <button class="lock-key" data-k="5">5</button>
+      <button class="lock-key" data-k="6">6</button>
+      <button class="lock-key" data-k="7">7</button>
+      <button class="lock-key" data-k="8">8</button>
+      <button class="lock-key" data-k="9">9</button>
+      <span></span>
+      <button class="lock-key" data-k="0">0</button>
+      <button class="lock-key ghost" data-k="del" aria-label="Стереть">&#9003;</button>
+    </div>
+    <button class="lock-bio" id="lockBio" hidden>Войти по Face ID</button>
+    <div class="lock-note" id="lockNote"></div>
+  </div>
+</div>
+
+<!-- ===== Тост: буфер возврата живет до исчезновения тоста (п. 5.3) ===== -->
+<div id="toast" role="status">
+  <span id="toastText"></span>
+  <button id="toastAct" hidden>Вернуть</button>
+</div>
+
+<!-- ===== Плашка встроенного браузера (п. 8.1): один раз за сессию ===== -->
+<div id="bannerTg" hidden>
+  <p>Похоже, страница открыта во встроенном браузере. Чтобы записи надежно сохранялись, откройте сайт в Safari: кнопка с тремя точками, затем пункт Открыть в Safari</p>
+  <button id="bannerOk">Понятно</button>
+</div>
+
+<!-- Печатное представление (п. 7.4): наполняется скриптом перед печатью -->
+<div id="printView"></div>
+
+<input type="file" id="importFile" accept=".json,application/json" hidden>
+
+<script>
+(function(){
+'use strict';
+
+/* Версия приложения: дублируется в комментарии первой строки файла (п. 2.3) */
+var APP_VERSION = 'v1.3';
+
+function $(s, r){ return (r || document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+
+/* ===== Идентификаторы (п. 3.5) ===== */
+function uid(){
+  if (window.crypto && crypto.randomUUID){ return crypto.randomUUID(); }
+  return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+
+/* ===== Хранилище (п. 3.1, 3.6, 10.3): один ключ, отложенная запись, защиты из исходника ===== */
+var KEY = 'govorisebepravdu_v1';
+var storageOk = true;     /* false: нет доступа (приватный режим, песочница) - работаю в памяти */
+var brokenStore = false;  /* true: сохраненный JSON был поврежден и убран в резервную копию */
+var tabLock = false;      /* true: данные изменила другая вкладка - запись заблокирована до перезагрузки */
+var newerStore = false;   /* true: в хранилище данные более новой версии - файл их не трогает */
+var newerRaw = null;
+var store = { version: 1, settings: { theme: 'auto', quotes: true, reviewDays: 7 }, activeEntryId: null, entries: {} };
+
+function defSettings(){ return { theme: 'auto', quotes: true, reviewDays: 7 }; }
+
+function loadStore(){
+  var raw;
+  try { raw = localStorage.getItem(KEY); }
+  catch (e){ storageOk = false; return; }
+  if (raw === null || raw === undefined){ return; }
+  try {
+    var data = JSON.parse(raw);
+    /* Данные новее файла (п. 3.6): не стираю и не пишу поверх */
+    if (data && typeof data.version === 'number' && data.version > 1){
+      newerStore = true;
+      newerRaw = raw;
+      storageOk = false;
+      return;
+    }
+    if (!data || data.version !== 1 || typeof data.entries !== 'object' || !data.entries){ throw new Error('структура'); }
+    if (!data.settings || typeof data.settings !== 'object'){ data.settings = defSettings(); }
+    store = data;
+  } catch (e){
+    brokenStore = true;
+    try {
+      localStorage.setItem(KEY + '_backup', raw);
+      localStorage.setItem(KEY + '_backupAt', new Date().toISOString());
+      localStorage.removeItem(KEY);
+    } catch (e2){}
+  }
+}
+loadStore();
+
+var saveTimer = null;
+function saveNow(){
+  if (!storageOk || tabLock){ return; }
+  clearTimeout(saveTimer);
+  saveTimer = null;
+  try { localStorage.setItem(KEY, JSON.stringify(store)); }
+  catch (e){ toast('Не хватает места в хранилище. Выгрузите архив .json и удалите лишнее'); }
+}
+function scheduleSave(){
+  if (!storageOk){ return; }
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(saveNow, 300); /* отложенная запись 300 мс (п. 3.1) */
+}
+window.addEventListener('pagehide', saveNow);
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'hidden'){ saveNow(); }
+});
+
+/* Стоп-кран второй вкладки (п. 3.6): не синхронизация, а защита от взаимного затирания */
+window.addEventListener('storage', function(e){
+  if ((e.key !== null && e.key !== KEY) || tabLock || !storageOk){ return; }
+  if (!entry){ /* экран списка: перечитываю и показываю свежее */
+    loadStore();
+    renderList();
+    return;
+  }
+  tabLock = true; /* редактор: замораживаю запись до перезагрузки */
+  $('#tabBar').hidden = false;
+  $('#tabBarL').hidden = false;
+});
+
+/* ===== Модель (п. 3.2) ===== */
+var MAX_ENTRIES = 20000;
+var MAX_MOTIVES = 20;
+function makeEntry(type){
+  var now = new Date().toISOString();
+  return { id: uid(), type: type === 'judge' ? 'judge' : 'own', act: '', who: '',
+    motives: [], review: '', reviewAt: '', reviewNote: '', createdAt: now, updatedAt: now };
+}
+function makeMotive(late){
+  return { id: uid(), text: '', kind: 'nice', key: false, late: late === true };
+}
+var TYPE_LABEL = { own: 'свой поступок', judge: 'чужой поступок' };
+var KIND_LABEL = { nice: 'симпатичный', notnice: 'не очень' };
+var REVIEW_CODES = ['honest', 'partly', 'blind'];
+var REVIEW_LABEL = { honest: 'честно', partly: 'не вполне', blind: 'главного не увидел' };
+
+function normSp(t){ return t.replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, ''); }
+function isText(s){ return String(s || '').replace(/\s+/g, '').length > 0; }
+function filledMotives(en){
+  var out = [];
+  for (var i = 0; i < en.motives.length; i++){ if (isText(en.motives[i].text)){ out.push(en.motives[i]); } }
+  return out;
+}
+function plural(n, one, few, many){
+  var d = n % 10, h = n % 100;
+  if (h >= 11 && h <= 14){ return many; }
+  if (d === 1){ return one; }
+  if (d >= 2 && d <= 4){ return few; }
+  return many;
+}
+/* Счетчик вида "3 мотива, из них 1 не очень" (п. 4.3) */
+function motiveSummary(en){
+  var f = filledMotives(en);
+  if (!f.length){ return 'мотивов пока нет'; }
+  var m = 0;
+  for (var i = 0; i < f.length; i++){ if (f[i].kind === 'notnice'){ m++; } }
+  var s = f.length + ' ' + plural(f.length, 'мотив', 'мотива', 'мотивов');
+  if (m){ s += ', из них ' + m + ' не очень'; }
+  return s;
+}
+
+function touch(){
+  if (!entry){ return; }
+  entry.updatedAt = new Date().toISOString();
+  scheduleSave();
+}
+
+/* ===== Состояние ===== */
+var entry = null;        /* активная запись */
+var toastFn = null;      /* действие кнопки тоста: возврат удаленного (п. 5.3) */
+var pendingOk = null;    /* действие кнопки Ок в диалоге подтверждения */
+var pendingImport = null;/* очищенные записи из загружаемого файла (п. 7.2) */
+var rvOpen = false;      /* открыт слой перечитывания */
+var rvNewIds = {};       /* id мотивов, дописанных в текущей сессии перечитывания */
+var rvChoice = '';       /* выбранная отметка перечитывания */
+
+/* ===== Блокировка прокрутки фона под слоями (п. 4.1) ===== */
+var lockCount = 0;
+function lock(on){
+  lockCount = Math.max(0, lockCount + (on ? 1 : -1));
+  document.documentElement.classList.toggle('locked', lockCount > 0);
+}
+function openLayer(el){ el.hidden = false; lock(true); }
+function closeLayer(el){ if (el.hidden) return; el.hidden = true; lock(false); }
+
+/* ===== Навигация экранов (п. 4.1) ===== */
+function go(id){
+  $$('[data-screen]').forEach(function(s){ s.hidden = (s.id !== id); });
+  window.scrollTo(0, 0);
+}
+
+/* ===== Тема (п. 9) ===== */
+var THEME_ORDER = ['auto', 'light', 'dark'];
+var COLOR_LIGHT = '#F6F5F1';
+var COLOR_DARK = '#15171B';
+var themeMode = THEME_ORDER.indexOf(store.settings.theme) !== -1 ? store.settings.theme : 'auto';
+var mediaDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+function applyTheme(){
+  var dark = (themeMode === 'dark') || (themeMode === 'auto' && mediaDark.matches);
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+  $$('meta[name="theme-color"]').forEach(function(m){
+    m.setAttribute('content', dark ? COLOR_DARK : COLOR_LIGHT);
+  });
+  $$('#themeSeg [data-theme-opt]').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-theme-opt') === themeMode);
+  });
+}
+if (mediaDark.addEventListener){ mediaDark.addEventListener('change', applyTheme); }
+else if (mediaDark.addListener){ mediaDark.addListener(applyTheme); }
+
+$('#themeSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-theme-opt]');
+  if (!b){ return; }
+  themeMode = b.getAttribute('data-theme-opt');
+  store.settings.theme = themeMode;
+  scheduleSave();
+  applyTheme();
+});
+
+/* ===== Подсказки-цитаты (п. 5.5): дословно, ротация, отключаемы ===== */
+var VALUE_SRC = 'В.К. Тарасов, вторая ценность Таллинской школы менеджеров';
+var VALUE_QUOTES = [
+  'Говорить себе правду - значит видеть всю сложную комбинацию мотивов - и симпатичных и не очень - лежащих в основе каждого собственного поступка и в каждой оценке поступков других людей. Простых мотивов не бывает.',
+  'Учись говорить себе правду, овладевай этим непростым искусством, тогда картина мира будет адекватна.'
+]; /* в v1.0 две цитаты, остальное - резерв байтов (п. 5.5) */
+var quoteIdx = Math.floor(Math.random() * VALUE_QUOTES.length);
+function quotesOn(){ return store.settings.quotes !== false; }
+function renderEmptyQuote(){
+  var fig = $('#listEmpty .quote');
+  if (!quotesOn()){ fig.hidden = true; return; }
+  fig.hidden = false;
+  $('#listEmpty blockquote').textContent = '«' + VALUE_QUOTES[quoteIdx % VALUE_QUOTES.length] + '»';
+  $('#listEmpty figcaption').textContent = VALUE_SRC;
+}
+function applyQuotesSeg(){
+  $$('#quoteSeg [data-quote-opt]').forEach(function(b){
+    b.classList.toggle('active', (b.getAttribute('data-quote-opt') === 'on') === quotesOn());
+  });
+}
+$('#quoteSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-quote-opt]');
+  if (!b){ return; }
+  store.settings.quotes = b.getAttribute('data-quote-opt') === 'on';
+  scheduleSave();
+  applyQuotesSeg();
+  if (entry){ updateHint(); }
+  else if (!$('#listEmpty').hidden){ renderEmptyQuote(); }
+});
+
+/* ===== Срок полки "Пора перечитать" (п. 3.3): 3 | 7 | 14 | 30 дней ===== */
+var DAYS_OPTS = [3, 7, 14, 30];
+function reviewDays(){
+  var v = store.settings.reviewDays;
+  return DAYS_OPTS.indexOf(v) !== -1 ? v : 7;
+}
+function applyDaysSeg(){
+  $$('#daysSeg [data-days-opt]').forEach(function(b){
+    b.classList.toggle('active', Number(b.getAttribute('data-days-opt')) === reviewDays());
+  });
+}
+$('#daysSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-days-opt]');
+  if (!b){ return; }
+  store.settings.reviewDays = Number(b.getAttribute('data-days-opt'));
+  scheduleSave();
+  applyDaysSeg();
+  if (!entry){ renderList(); }
+});
+
+/* ===== Индикатор полноты записи (п. 5.4): 5 критериев, считается на лету ===== */
+function completeness(en){
+  var f = filledMotives(en);
+  var hasNotNice = false, hasKey = false;
+  for (var i = 0; i < f.length; i++){
+    if (f[i].kind === 'notnice'){ hasNotNice = true; }
+    if (f[i].key === true){ hasKey = true; }
+  }
+  var crit = [
+    isText(en.act),
+    f.length >= 2,
+    hasNotNice,
+    hasKey,
+    en.review !== ''
+  ];
+  var n = 0;
+  for (var j = 0; j < crit.length; j++){ if (crit[j]){ n++; } }
+  return { n: n, crit: crit };
+}
+var COMP_DONE = [
+  'Описание заполнено',
+  'Мотивов два или больше',
+  'Есть мотив «не очень»',
+  '«Мышка» найдена',
+  'Запись перечитана'
+];
+var COMP_TODO = [
+  'Опишите поступок или оценку',
+  'Назовите второй мотив: простых мотивов не бывает',
+  'Поищите мотив, который неприятно признавать',
+  'Отметьте мотив, без которого ничего бы не состоялось',
+  'Вернитесь к записи через несколько дней и перечитайте'
+];
+var compBk = $('#compBk');
+function updateComp(){
+  if (!entry){ return; }
+  $('#compPill').textContent = 'полнота ' + completeness(entry).n + ' из 5';
+  $('#mtvCount').textContent = motiveSummary(entry);
+}
+function buildCompList(){
+  var r = completeness(entry);
+  var host = $('#compList');
+  while (host.firstChild){ host.removeChild(host.firstChild); }
+  for (var i = 0; i < 5; i++){
+    var row = el('div', 'comp-row' + (r.crit[i] ? ' done' : ''));
+    var mark = el('span', 'comp-mark');
+    mark.textContent = r.crit[i] ? '✓' : '○';
+    var txt = el('span', 'comp-txt');
+    txt.textContent = r.crit[i] ? COMP_DONE[i] : COMP_TODO[i];
+    row.appendChild(mark); row.appendChild(txt);
+    host.appendChild(row);
+  }
+}
+$('#compPill').addEventListener('click', function(){
+  if (!entry){ return; }
+  buildCompList();
+  openLayer(compBk);
+});
+compBk.addEventListener('click', function(e){ if (e.target === compBk){ closeLayer(compBk); } });
+
+/* ===== Помощник честности (п. 5.6): наборы вопросов по типу записи ===== */
+var DIG_OWN = [
+  'Что я получил этим поступком?',
+  'Чего я избежал?',
+  'Как я хотел выглядеть в чужих и своих глазах?',
+  'Что мне неприятно признавать?',
+  'Не строю ли я алиби для самого себя: не изображаю ли старание вместо результата?',
+  'Какой слабый мотив мог оказаться мышкой - без которого я поступил бы иначе?'
+];
+var DIG_JUDGE = [
+  'Спросил ли я о причинах и мотивах его поступка, прежде чем осудить?',
+  'Что моя оценка говорит о моих собственных мотивах (зависть, задетая гордость, желание казаться лучше)?',
+  'Не осуждаю ли я поспешно, чтобы не признавать свою поспешность потом?'
+];
+var digBk = $('#digBk');
+$('#btnDig').addEventListener('click', function(){
+  if (!entry){ return; }
+  var host = $('#digList');
+  while (host.firstChild){ host.removeChild(host.firstChild); }
+  var qs = entry.type === 'judge' ? DIG_JUDGE : DIG_OWN;
+  for (var i = 0; i < qs.length; i++){
+    var p = el('p', 'dig-q');
+    p.textContent = qs[i];
+    host.appendChild(p);
+  }
+  openLayer(digBk);
+});
+digBk.addEventListener('click', function(e){ if (e.target === digBk){ closeLayer(digBk); } });
+
+/* ===== Авторост текстовых полей (перенос, п. 2.4) ===== */
+function grow(el){
+  el.style.height = 'auto';
+  var h = el.scrollHeight;
+  if (h > 0){ el.style.height = h + 'px'; } else { el.style.height = ''; }
+}
+function growAll(root){ $$('textarea', root || document).forEach(grow); }
+var growRaf = null;
+window.addEventListener('resize', function(){
+  if (growRaf) return;
+  growRaf = requestAnimationFrame(function(){ growRaf = null; growAll(); });
+});
+
+/* ===== Поповеры меню (перенос) ===== */
+var popBk = $('#popBk');
+var openPop = null;
+function openMenu(pop, anchor){
+  closeMenu();
+  pop.hidden = false;
+  popBk.hidden = false;
+  var r = anchor.getBoundingClientRect();
+  var top = Math.min(r.bottom + 6, window.innerHeight - pop.offsetHeight - 12);
+  var left = Math.min(Math.max(12, r.right - pop.offsetWidth), window.innerWidth - pop.offsetWidth - 12);
+  pop.style.top = Math.max(12, top) + 'px';
+  pop.style.left = left + 'px';
+  openPop = pop;
+}
+function closeMenu(){
+  if (openPop){ openPop.hidden = true; openPop = null; }
+  popBk.hidden = true;
+}
+popBk.addEventListener('click', closeMenu);
+
+/* ===== Тост (п. 5.3): буфер возврата живет до исчезновения тоста ===== */
+var toastEl = $('#toast');
+var toastTimer = null;
+function toast(text, actionLabel, fn){
+  toastFn = fn || null;
+  $('#toastText').textContent = text;
+  var act = $('#toastAct');
+  if (actionLabel){ act.textContent = actionLabel; act.hidden = false; }
+  else { act.hidden = true; }
+  toastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(hideToast, 5000);
+}
+function hideToast(){
+  toastEl.classList.remove('show');
+  clearTimeout(toastTimer);
+  toastFn = null;
+}
+$('#toastAct').addEventListener('click', function(){
+  var fn = toastFn;
+  toastFn = null;
+  hideToast();
+  if (fn){ fn(); }
+});
+
+/* ===== Диалог подтверждения (перенос) ===== */
+var dlgBk = $('#dlgBk');
+var dlgOkBtn = $('#dlgOk');
+function confirmDlg(text, onOk, okLabel){
+  $('#dlgText').textContent = text;
+  dlgOkBtn.textContent = okLabel || 'Удалить';
+  dlgOkBtn.classList.toggle('danger', !okLabel);
+  pendingOk = onOk || null;
+  openLayer(dlgBk);
+}
+$('#dlgCancel').addEventListener('click', function(){ pendingOk = null; closeLayer(dlgBk); });
+$('#dlgOk').addEventListener('click', function(){
+  var f = pendingOk;
+  pendingOk = null;
+  closeLayer(dlgBk);
+  if (f){ f(); }
+});
+dlgBk.addEventListener('click', function(e){ if (e.target === dlgBk){ pendingOk = null; closeLayer(dlgBk); } });
+
+/* ===== Настройки и справка (п. 8.2) ===== */
+var aboutBk = $('#aboutBk');
+$('#aboutVer').textContent = 'Версия ' + APP_VERSION;
+function bkRaw(){ try { return localStorage.getItem(KEY + '_backup'); } catch (e){ return null; } }
+function updateSetInfo(){
+  var at = '';
+  try { at = localStorage.getItem(KEY + '_backupAt') || ''; } catch (e){}
+  var has = !!bkRaw();
+  $('#bkRow').hidden = !has;
+  if (has){ $('#bkLbl').textContent = 'Резервная копия' + (fmtDate(at) ? ' от ' + fmtDate(at) : ''); }
+  /* Индикатор занятого места (п. 3.6) */
+  $('#quotaLine').textContent = 'Занято ~' + Math.max(1, Math.round(JSON.stringify(store).length / 1024)) +
+    ' КБ; предел браузера около 5 МБ';
+  updateLockRows();
+}
+$('#btnBkDown').addEventListener('click', function(){
+  var raw = bkRaw();
+  if (raw){ shareOrDownload('govori-sebe-pravdu_kopia_' + fileStamp() + '.json', raw, 'application/json'); }
+});
+/* Восстановление из резервной копии (п. 3.6): через белый список, текущие записи заменяются */
+$('#btnBkRestore').addEventListener('click', function(){
+  closeLayer(aboutBk);
+  confirmDlg('Восстановить записи из резервной копии? Текущие записи будут заменены', function(){
+    var raw = bkRaw();
+    var list = null;
+    try { list = sanitizeArchive(JSON.parse(raw)); } catch (e){}
+    if (!list){ toast('Копия повреждена, восстановить не удалось. Выгрузите ее файлом'); return; }
+    store.entries = {};
+    for (var i = 0; i < list.length; i++){ store.entries[list[i].id] = list[i]; }
+    store.activeEntryId = null;
+    saveNow();
+    renderList();
+    toast('Восстановлено записей: ' + list.length);
+  }, 'Восстановить');
+});
+$('#btnBkDel').addEventListener('click', function(){
+  closeLayer(aboutBk); /* иначе диалог окажется под настройками */
+  confirmDlg('Удалить резервную копию?', function(){
+    try { localStorage.removeItem(KEY + '_backup'); localStorage.removeItem(KEY + '_backupAt'); } catch (e){}
+    toast('Резервная копия удалена');
+  });
+});
+$('#btnSettings').addEventListener('click', function(){ updateSetInfo(); openLayer(aboutBk); });
+$('#aboutOk').addEventListener('click', function(){ closeLayer(aboutBk); });
+aboutBk.addEventListener('click', function(e){ if (e.target === aboutBk) closeLayer(aboutBk); });
+
+/* ===== Вспомогательные ===== */
+function el(tag, cls){
+  var e = document.createElement(tag);
+  if (cls){ e.className = cls; }
+  return e;
+}
+function svgIcon(href){
+  var svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('class', 'icon');
+  var use = document.createElementNS('http://www.w3.org/2000/svg', 'use');
+  use.setAttribute('href', href);
+  svg.appendChild(use);
+  return svg;
+}
+function iconBtn(cls, label, icon){
+  var b = el('button', cls);
+  b.setAttribute('aria-label', label);
+  b.appendChild(svgIcon(icon));
+  return b;
+}
+function fmtDate(iso){
+  var d = new Date(iso);
+  if (isNaN(d.getTime())){ return ''; }
+  var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  return pad(d.getDate()) + '.' + pad(d.getMonth() + 1) + '.' + d.getFullYear();
+}
+/* Ключ дня в местном времени: группировка ленты (п. 4.3) */
+function dayKey(iso){
+  var d = new Date(iso);
+  if (isNaN(d.getTime())){ return ''; }
+  var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+}
+function dayLabel(iso){
+  var k = dayKey(iso);
+  var now = new Date();
+  if (k === dayKey(now.toISOString())){ return 'Сегодня'; }
+  var y = new Date(now.getTime() - 864e5);
+  if (k === dayKey(y.toISOString())){ return 'Вчера'; }
+  return fmtDate(iso);
+}
+function daysAgo(iso){
+  var t = Date.parse(iso);
+  if (isNaN(t)){ return 0; }
+  return Math.max(0, Math.floor((Date.now() - t) / 864e5));
+}
+function firstLine(s, max){
+  s = normSp(String(s || ''));
+  if (!s){ return ''; }
+  return s.length > max ? s.slice(0, max) + '…' : s;
+}
+function entryCount(){
+  var n = 0;
+  for (var k in store.entries){
+    if (Object.prototype.hasOwnProperty.call(store.entries, k)){ n++; }
+  }
+  return n;
+}
+
+/* ===== Список "Мои записи" (п. 4.3) ===== */
+var entryListEl = $('#entryList');
+var listQuery = '';
+var typeFilter = 'all';
+var onlyUnrev = false;
+
+function entriesSorted(){
+  var arr = [];
+  for (var k in store.entries){
+    if (Object.prototype.hasOwnProperty.call(store.entries, k)){ arr.push(store.entries[k]); }
+  }
+  arr.sort(function(a, b){ return a.createdAt < b.createdAt ? 1 : (a.createdAt > b.createdAt ? -1 : 0); });
+  return arr;
+}
+/* Поиск по act, who, мотивам и reviewNote (п. 4.3) */
+function entrySearchText(en){
+  var parts = [en.act || '', en.who || '', en.reviewNote || ''];
+  for (var i = 0; i < en.motives.length; i++){ parts.push(en.motives[i].text || ''); }
+  return parts.join('\n').toLowerCase();
+}
+/* Записи для полки: старше reviewDays и без отметки, самые давние впереди (п. 4.3) */
+function shelfEntries(){
+  var out = [];
+  var all = entriesSorted();
+  for (var i = 0; i < all.length; i++){
+    var en = all[i];
+    if (en.review === '' && daysAgo(en.createdAt) >= reviewDays()){ out.push(en); }
+  }
+  out.sort(function(a, b){ return a.createdAt < b.createdAt ? -1 : 1; });
+  return out;
+}
+function renderShelf(){
+  var box = $('#shelf');
+  var host = $('#shelfItems');
+  while (host.firstChild){ host.removeChild(host.firstChild); }
+  var list = shelfEntries();
+  if (!list.length){ box.hidden = true; return; } /* пустая полка скрыта */
+  box.hidden = false;
+  var show = Math.min(3, list.length);
+  for (var i = 0; i < show; i++){
+    var en = list[i];
+    var b = el('button', 'shelf-item');
+    b.setAttribute('data-id', en.id);
+    var tx = el('span', 'shelf-txt');
+    tx.textContent = isText(en.act) ? firstLine(en.act, 80) : '(без описания)';
+    var dd = el('span', 'shelf-days');
+    var n = daysAgo(en.createdAt);
+    dd.textContent = n + ' ' + plural(n, 'день', 'дня', 'дней');
+    b.appendChild(tx); b.appendChild(dd);
+    host.appendChild(b);
+  }
+  var more = $('#shelfMore');
+  if (list.length > show){
+    more.textContent = 'и еще ' + (list.length - show);
+    more.hidden = false;
+  } else { more.hidden = true; }
+}
+$('#shelfItems').addEventListener('click', function(e){
+  var b = e.target.closest('.shelf-item');
+  if (!b){ return; }
+  var en = store.entries[b.getAttribute('data-id')];
+  if (en){ enterEditor(en); openReview(); }
+});
+
+function entryCard(en){
+  var b = el('button', 'doc');
+  b.setAttribute('data-id', en.id);
+  var top = el('span', 'doc-top');
+  var badge = el('span', 'badge');
+  badge.textContent = TYPE_LABEL[en.type] || 'свой поступок';
+  top.appendChild(badge);
+  if (en.type === 'judge' && isText(en.who)){
+    var whoSp = el('span');
+    whoSp.textContent = firstLine(en.who, 30);
+    top.appendChild(whoSp);
+  }
+  if (en.review){ /* отметка перечитывания (п. 4.3) */
+    var mk = el('span', 'doc-mark');
+    mk.textContent = '✓ ' + REVIEW_LABEL[en.review];
+    top.appendChild(mk);
+  }
+  top.appendChild(el('span', 'sp'));
+  var kb = el('span', 'iconbtn doc-kebab');
+  kb.setAttribute('role', 'button');
+  kb.setAttribute('tabindex', '0');
+  kb.setAttribute('aria-label', 'Меню записи');
+  kb.appendChild(svgIcon('#i-dots'));
+  top.appendChild(kb);
+  b.appendChild(top);
+  var act = el('span', 'doc-act' + (isText(en.act) ? '' : ' empty'));
+  act.textContent = isText(en.act) ? en.act : '(без описания)';
+  b.appendChild(act);
+  var meta = el('span', 'doc-meta');
+  var ms = el('span');
+  ms.textContent = motiveSummary(en);
+  meta.appendChild(ms);
+  meta.appendChild(el('span', 'sp'));
+  var rv = el('span', 'doc-rv');
+  rv.setAttribute('role', 'button');
+  rv.setAttribute('tabindex', '0');
+  rv.textContent = 'Перечитать';
+  meta.appendChild(rv);
+  b.appendChild(meta);
+  return b;
+}
+
+/* Записи по текущим фильтрам списка (п. 4.3): лента и экспорт части записей в Obsidian */
+function listFiltered(){
+  var all = entriesSorted();
+  var q = normSp(listQuery).toLowerCase();
+  var arr = [];
+  for (var i = 0; i < all.length; i++){
+    var en = all[i];
+    if (typeFilter !== 'all' && en.type !== typeFilter){ continue; }
+    if (onlyUnrev && en.review !== ''){ continue; }
+    if (q && entrySearchText(en).indexOf(q) === -1){ continue; }
+    arr.push(en);
+  }
+  return arr;
+}
+
+function renderList(){
+  while (entryListEl.firstChild){ entryListEl.removeChild(entryListEl.firstChild); }
+  var all = entriesSorted();
+  $('#listFull').hidden = all.length === 0;
+  $('#listEmpty').hidden = all.length > 0;
+  if (all.length === 0){ renderEmptyQuote(); quoteIdx++; return; }
+  renderShelf();
+  var arr = listFiltered();
+  if (!arr.length){
+    var none = el('p', 'hint');
+    none.textContent = 'Ничего не найдено. Измените запрос или снимите фильтры';
+    entryListEl.appendChild(none);
+    return;
+  }
+  var lastDay = null;
+  for (var j = 0; j < arr.length; j++){
+    var k = dayKey(arr[j].createdAt);
+    if (k !== lastDay){
+      lastDay = k;
+      var head = el('div', 'list-head');
+      head.textContent = dayLabel(arr[j].createdAt);
+      entryListEl.appendChild(head);
+    }
+    entryListEl.appendChild(entryCard(arr[j]));
+  }
+}
+
+$('#listSearch').addEventListener('input', function(){ listQuery = this.value; renderList(); });
+$('#typeSel').addEventListener('change', function(){ typeFilter = this.value; renderList(); });
+$('#unrevBtn').addEventListener('click', function(){
+  onlyUnrev = !onlyUnrev;
+  this.classList.toggle('on', onlyUnrev);
+  this.setAttribute('aria-pressed', onlyUnrev ? 'true' : 'false');
+  renderList();
+});
+
+entryListEl.addEventListener('click', function(e){
+  var card = e.target.closest('.doc');
+  if (!card){ return; }
+  var en = store.entries[card.getAttribute('data-id')];
+  if (!en){ return; }
+  if (e.target.closest('.doc-kebab')){ /* меню карточки: без входа в редактор */
+    currentListId = en.id;
+    openMenu($('#popEntry'), e.target.closest('.doc-kebab'));
+    return;
+  }
+  if (e.target.closest('.doc-rv')){ /* кнопка "Перечитать" на карточке (п. 6.1) */
+    enterEditor(en);
+    openReview();
+    return;
+  }
+  enterEditor(en);
+});
+entryListEl.addEventListener('keydown', function(e){
+  if (e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar'){ return; }
+  var kb2 = e.target && e.target.closest ? e.target.closest('.doc-kebab') : null;
+  if (kb2){
+    var card2 = kb2.closest('.doc');
+    if (!card2){ return; }
+    e.preventDefault();
+    currentListId = card2.getAttribute('data-id');
+    openMenu($('#popEntry'), kb2);
+    return;
+  }
+  var rv = e.target && e.target.closest ? e.target.closest('.doc-rv') : null;
+  if (!rv){ return; }
+  var card = rv.closest('.doc');
+  if (!card){ return; }
+  e.preventDefault();
+  var en = store.entries[card.getAttribute('data-id')];
+  if (en){ enterEditor(en); openReview(); }
+});
+
+/* Меню карточки списка: перечитать и удалить, возврат из тоста (п. 11.1) */
+var currentListId = null;
+$('#miEntryReread').addEventListener('click', function(){
+  closeMenu();
+  var en = currentListId && store.entries[currentListId];
+  if (en){ enterEditor(en); openReview(); }
+});
+$('#miEntryDel').addEventListener('click', function(){
+  closeMenu();
+  var id = currentListId;
+  if (!id || !store.entries[id]){ return; }
+  confirmDlg('Удалить запись?', function(){
+    var en = store.entries[id];
+    if (!en){ return; }
+    delete store.entries[id];
+    if (store.activeEntryId === id){ store.activeEntryId = null; }
+    saveNow();
+    renderList();
+    toast('Запись удалена', 'Вернуть', function(){
+      store.entries[en.id] = en;
+      saveNow();
+      if (!entry){ renderList(); }
+    });
+  });
+});
+
+/* Новая запись: поступок или оценка (п. 4.3) */
+$$('[data-new]').forEach(function(b){
+  b.addEventListener('click', function(){
+    if (entryCount() >= MAX_ENTRIES){ toast('Достигнут предел записей. Выгрузите архив и удалите лишнее'); return; }
+    var en = makeEntry(b.getAttribute('data-new'));
+    store.entries[en.id] = en;
+    scheduleSave();
+    enterEditor(en);
+  });
+});
+
+/* ===== Редактор записи (п. 5) ===== */
+var editor = $('#editor');
+var mtvListEl = $('#mtvList');
+var taAct = $('#taAct');
+var inWho = $('#inWho');
+
+var ACT_LABEL = { own: 'Поступок', judge: 'Оценка' };
+var ACT_PH = { own: 'Что я сделал или решил?', judge: 'Чей поступок и в чем состояла моя оценка?' };
+var ED_TITLE = { own: 'Свой поступок', judge: 'Чужой поступок' };
+
+function applyType(){
+  var t = entry.type;
+  $('#edTitle').textContent = ED_TITLE[t];
+  $('#actLabel').textContent = ACT_LABEL[t];
+  taAct.setAttribute('placeholder', ACT_PH[t]);
+  $('#whoField').hidden = t !== 'judge';
+  $$('#typeSeg [data-type-opt]').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-type-opt') === t);
+  });
+}
+$('#typeSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-type-opt]');
+  if (!b || !entry){ return; }
+  entry.type = b.getAttribute('data-type-opt') === 'judge' ? 'judge' : 'own';
+  applyType();
+  touch();
+});
+
+/* Карточка мотива (п. 5.2): чипы "симпатичный | не очень" и "мышка", метка "дописан позже" */
+function motiveCard(m){
+  var card = el('article', 'mtv ' + (m.kind === 'notnice' ? 'notnice' : 'nice'));
+  card.setAttribute('data-id', m.id);
+  var top = el('div', 'mtv-top');
+  var chK = el('button', 'chip kind');
+  chK.textContent = KIND_LABEL[m.kind === 'notnice' ? 'notnice' : 'nice'];
+  chK.setAttribute('aria-label', 'Мотив: ' + KIND_LABEL[m.kind === 'notnice' ? 'notnice' : 'nice']);
+  top.appendChild(chK);
+  var chM = el('button', 'chip key' + (m.key ? ' on' : ''));
+  chM.textContent = 'мышка';
+  chM.setAttribute('aria-pressed', m.key ? 'true' : 'false');
+  chM.setAttribute('aria-label', 'Мышка: мотив, без которого ничего бы не состоялось');
+  top.appendChild(chM);
+  if (m.late){ /* информационная метка, редактирование не ограничено (п. 5.2) */
+    var lt = el('span', 'latechip');
+    lt.textContent = 'дописан позже';
+    top.appendChild(lt);
+  }
+  top.appendChild(el('span', 'sp'));
+  top.appendChild(iconBtn('iconbtn mtv-del', 'Удалить мотив', '#i-trash'));
+  card.appendChild(top);
+  var ta = el('textarea');
+  ta.rows = 1; ta.maxLength = 300;
+  ta.placeholder = 'Назовите мотив';
+  ta.value = m.text;
+  ta.setAttribute('data-mid', m.id);
+  card.appendChild(ta);
+  return card;
+}
+function renderMotives(){
+  while (mtvListEl.firstChild){ mtvListEl.removeChild(mtvListEl.firstChild); }
+  for (var i = 0; i < entry.motives.length; i++){
+    mtvListEl.appendChild(motiveCard(entry.motives[i]));
+  }
+  growAll(mtvListEl);
+}
+function findMotive(id){
+  for (var i = 0; i < entry.motives.length; i++){
+    if (entry.motives[i].id === id){ return { m: entry.motives[i], index: i }; }
+  }
+  return null;
+}
+function addMotive(host, late, focus){
+  if (entry.motives.length >= MAX_MOTIVES){ toast('Не больше 20 мотивов в одной записи'); return null; }
+  var m = makeMotive(late);
+  entry.motives.push(m);
+  if (late){ rvNewIds[m.id] = true; }
+  touch();
+  var card = motiveCard(m);
+  host.appendChild(card);
+  var ta = $('textarea', card);
+  if (focus && ta){
+    ta.focus({ preventScroll: true });
+    if (ta.scrollIntoView){ ta.scrollIntoView({ block: 'nearest' }); }
+  }
+  return m;
+}
+$('#btnAddMtv').addEventListener('click', function(){
+  if (!entry){ return; }
+  addMotive(mtvListEl, false, true);
+  updateComp();
+});
+
+/* Ввод текста мотива и описания: без перерендера списка (п. 5.3) */
+document.addEventListener('input', function(e){
+  var t = e.target;
+  if (!t || !entry){ return; }
+  if (t.id === 'taRvNote'){ grow(t); return; } /* заметка сохраняется по кнопке (п. 6.3) */
+  if (t === taAct){
+    grow(t);
+    entry.act = t.value;
+    touch();
+    updateComp();
+    return;
+  }
+  if (t === inWho){
+    entry.who = t.value;
+    touch();
+    return;
+  }
+  if (t.tagName === 'TEXTAREA' && t.getAttribute('data-mid')){
+    grow(t);
+    var f = findMotive(t.getAttribute('data-mid'));
+    if (f){ f.m.text = t.value; touch(); updateComp(); }
+  }
+});
+
+/* Чипы мотива: знак и "мышка" переключаются на месте, без перерендера */
+document.addEventListener('click', function(e){
+  var chip = e.target.closest('.chip');
+  if (!chip || !entry){ return; }
+  var card = chip.closest('.mtv');
+  if (!card){ return; }
+  var f = findMotive(card.getAttribute('data-id'));
+  if (!f){ return; }
+  if (chip.classList.contains('kind')){
+    f.m.kind = f.m.kind === 'nice' ? 'notnice' : 'nice';
+    card.classList.toggle('nice', f.m.kind === 'nice');
+    card.classList.toggle('notnice', f.m.kind === 'notnice');
+    chip.textContent = KIND_LABEL[f.m.kind];
+    chip.setAttribute('aria-label', 'Мотив: ' + KIND_LABEL[f.m.kind]);
+    touch();
+    updateComp();
+  } else if (chip.classList.contains('key')){
+    f.m.key = f.m.key !== true;
+    chip.classList.toggle('on', f.m.key);
+    chip.setAttribute('aria-pressed', f.m.key ? 'true' : 'false');
+    touch();
+    updateComp();
+  }
+});
+
+/* Удаление мотива: тост с возвратом (п. 5.3) */
+document.addEventListener('click', function(e){
+  var del = e.target.closest('.mtv-del');
+  if (!del || !entry){ return; }
+  var card = del.closest('.mtv');
+  if (!card){ return; }
+  var f = findMotive(card.getAttribute('data-id'));
+  if (!f){ return; }
+  var buf = { m: f.m, index: f.index };
+  entry.motives.splice(f.index, 1);
+  delete rvNewIds[buf.m.id];
+  touch();
+  card.parentNode.removeChild(card);
+  updateComp();
+  if (!isText(buf.m.text)){ return; } /* пустой мотив: без тоста */
+  toast('Мотив удален', 'Вернуть', function(){
+    if (!entry){ return; }
+    entry.motives.splice(Math.min(buf.index, entry.motives.length), 0, buf.m);
+    if (buf.m.late && rvOpen){ rvNewIds[buf.m.id] = true; }
+    touch();
+    if (rvOpen){ rvRender(); } else { renderMotives(); }
+    updateComp();
+  });
+});
+
+/* Плашка перечитанной записи в редакторе (п. 6.3) */
+function renderRvBar(){
+  var bar = $('#rvBar');
+  if (!entry.review){ bar.hidden = true; return; }
+  bar.hidden = false;
+  $('#rvBarTitle').textContent = 'Перечитана' +
+    (fmtDate(entry.reviewAt) ? ' ' + fmtDate(entry.reviewAt) : '') + ': ' + REVIEW_LABEL[entry.review];
+  var note = $('#rvBarNote');
+  if (isText(entry.reviewNote)){ note.textContent = entry.reviewNote; note.hidden = false; }
+  else { note.hidden = true; }
+}
+$('#btnRvAgain').addEventListener('click', function(){ if (entry){ openReview(); } });
+
+/* Подсказка-цитата в редакторе (п. 5.5): ротация при каждом входе */
+function updateHint(){
+  var h = $('#hintLine');
+  if (!quotesOn()){ h.hidden = true; return; }
+  h.textContent = '«' + VALUE_QUOTES[quoteIdx % VALUE_QUOTES.length] + '»';
+  h.hidden = false;
+}
+
+function enterEditor(en){
+  hideToast();
+  entry = en;
+  store.activeEntryId = en.id;
+  scheduleSave();
+  quoteIdx++;
+  applyType();
+  inWho.value = en.who || '';
+  taAct.value = en.act || '';
+  renderMotives();
+  renderRvBar();
+  updateComp();
+  updateHint();
+  go('scrEditor');
+  growAll(editor);
+}
+
+function goList(){
+  hideToast();
+  entry = null;
+  store.activeEntryId = null;
+  scheduleSave();
+  renderList();
+  go('scrList');
+}
+$('#btnBack').addEventListener('click', goList);
+
+/* Меню редактора: перечитать, удалить запись (возврат из тоста, п. 11.1) */
+$('#btnEdMenu').addEventListener('click', function(){ openMenu($('#popEd'), $('#btnEdMenu')); });
+$('#miReread').addEventListener('click', function(){ closeMenu(); if (entry){ openReview(); } });
+$('#miDelEntry').addEventListener('click', function(){
+  closeMenu();
+  if (!entry){ return; }
+  confirmDlg('Удалить запись?', function(){
+    var en = entry;
+    delete store.entries[en.id];
+    saveNow();
+    goList();
+    toast('Запись удалена', 'Вернуть', function(){
+      store.entries[en.id] = en;
+      saveNow();
+      if (!entry){ renderList(); }
+    });
+  });
+});
+
+/* ===== Перечитывание (п. 6): исходное только для чтения ===== */
+var rvw = $('#rvw');
+function roMotiveRow(m){
+  var row = el('div', 'ro-mtv');
+  var kind = el('span', 'ro-kind ' + (m.kind === 'notnice' ? 'notnice' : 'nice'));
+  kind.textContent = KIND_LABEL[m.kind === 'notnice' ? 'notnice' : 'nice'];
+  row.appendChild(kind);
+  var tx = el('span', 'ro-mtxt');
+  tx.textContent = isText(m.text) ? m.text : '(без текста)';
+  row.appendChild(tx);
+  var flags = [];
+  if (m.key){ flags.push('мышка'); }
+  if (m.late){ flags.push('дописан позже'); }
+  if (flags.length){
+    var fl = el('span', 'ro-flags');
+    fl.textContent = flags.join(' · ');
+    row.appendChild(fl);
+  }
+  return row;
+}
+function syncRvSeg(){
+  $$('#rvSeg [data-rv-opt]').forEach(function(b){
+    b.classList.toggle('on', b.getAttribute('data-rv-opt') === rvChoice);
+    b.setAttribute('aria-pressed', b.getAttribute('data-rv-opt') === rvChoice ? 'true' : 'false');
+  });
+}
+function rvRender(){
+  $('#rvActLabel').textContent = ACT_LABEL[entry.type];
+  var act = $('#rvAct');
+  act.textContent = isText(entry.act) ? entry.act : '(без описания)';
+  act.className = 'ro-text' + (isText(entry.act) ? '' : ' empty');
+  var whoBox = $('#rvWhoBox');
+  if (entry.type === 'judge' && isText(entry.who)){
+    whoBox.hidden = false;
+    $('#rvWho').textContent = entry.who;
+  } else { whoBox.hidden = true; }
+  var host = $('#rvMtvs');
+  while (host.firstChild){ host.removeChild(host.firstChild); }
+  var shown = 0;
+  for (var i = 0; i < entry.motives.length; i++){
+    var m = entry.motives[i];
+    if (rvNewIds[m.id]){ continue; } /* дописанные в этой сессии - ниже, редактируемы */
+    host.appendChild(roMotiveRow(m));
+    shown++;
+  }
+  if (!shown){
+    var none = el('div', 'ro-text empty');
+    none.textContent = '(мотивы не записаны)';
+    host.appendChild(none);
+  }
+  var nl = $('#rvNewList');
+  while (nl.firstChild){ nl.removeChild(nl.firstChild); }
+  for (var j = 0; j < entry.motives.length; j++){
+    if (rvNewIds[entry.motives[j].id]){ nl.appendChild(motiveCard(entry.motives[j])); }
+  }
+  growAll(nl);
+}
+function openReview(){
+  rvOpen = true;
+  rvNewIds = {};
+  rvChoice = entry.review || '';
+  rvRender();
+  syncRvSeg();
+  $('#taRvNote').value = entry.reviewNote || '';
+  openLayer(rvw);
+  rvw.scrollTop = 0;
+  grow($('#taRvNote'));
+}
+function closeReview(){
+  if (!rvOpen){ return; }
+  rvOpen = false;
+  rvNewIds = {};
+  closeLayer(rvw);
+  /* поздние мотивы уже в записи: показать их в редакторе (п. 6.2) */
+  renderMotives();
+  renderRvBar();
+  updateComp();
+}
+$('#rvClose').addEventListener('click', closeReview);
+$('#rvAddMtv').addEventListener('click', function(){
+  if (!entry){ return; }
+  addMotive($('#rvNewList'), true, true); /* автоматически late=true (п. 6.2) */
+  updateComp();
+});
+$('#rvSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-rv-opt]');
+  if (!b){ return; }
+  rvChoice = b.getAttribute('data-rv-opt');
+  syncRvSeg();
+});
+$('#rvSave').addEventListener('click', function(){
+  if (!entry){ return; }
+  if (!rvChoice){ toast('Выберите отметку: какой была запись'); return; }
+  entry.review = rvChoice;
+  entry.reviewAt = new Date().toISOString(); /* п. 6.3 */
+  entry.reviewNote = $('#taRvNote').value;
+  touch();
+  closeReview();
+  toast('Перечитывание сохранено');
+});
+/* Примечание к вводу заметки: сохраняется только по кнопке Сохранить (п. 6.3) */
+
+/* ===== Белый список при загрузке (п. 10.1): чужие данные не доверяются ===== */
+function sanitizeEntry(raw){
+  if (!raw || typeof raw !== 'object'){ throw new Error('структура'); }
+  var e = makeEntry(raw.type === 'judge' ? 'judge' : 'own');
+  if (typeof raw.act === 'string'){ e.act = raw.act.slice(0, 2000); }
+  if (e.type === 'judge' && typeof raw.who === 'string'){ e.who = raw.who.slice(0, 120); }
+  if (raw.motives !== undefined && !Array.isArray(raw.motives)){ throw new Error('мотивы'); }
+  if (Array.isArray(raw.motives)){
+    if (raw.motives.length > MAX_MOTIVES){ throw new Error('мотивы'); } /* лимит п. 3.4 - исключение */
+    for (var i = 0; i < raw.motives.length; i++){
+      var rm = raw.motives[i];
+      if (!rm || typeof rm !== 'object'){ continue; }
+      var m = makeMotive(rm.late === true);
+      if (typeof rm.text === 'string'){ m.text = rm.text.slice(0, 300); }
+      m.kind = rm.kind === 'notnice' ? 'notnice' : 'nice';
+      m.key = rm.key === true;
+      e.motives.push(m);
+    }
+  }
+  if (REVIEW_CODES.indexOf(raw.review) !== -1){ e.review = raw.review; }
+  if (e.review && typeof raw.reviewAt === 'string' && !isNaN(Date.parse(raw.reviewAt))){ e.reviewAt = raw.reviewAt; }
+  if (typeof raw.reviewNote === 'string'){ e.reviewNote = raw.reviewNote.slice(0, 2000); }
+  if (typeof raw.createdAt === 'string' && !isNaN(Date.parse(raw.createdAt))){ e.createdAt = raw.createdAt; }
+  if (typeof raw.updatedAt === 'string' && !isNaN(Date.parse(raw.updatedAt))){ e.updatedAt = raw.updatedAt; }
+  return e; /* id всегда регенерирован в makeEntry; незнакомые поля отброшены молча */
+}
+/* Архив: корень с entries (объект или массив); превышение лимитов - исключение и отказ (п. 3.4) */
+function sanitizeArchive(raw){
+  if (!raw || typeof raw !== 'object'){ throw new Error('структура'); }
+  if (typeof raw.version === 'number' && raw.version > 1){ throw new Error('версия'); }
+  var src = raw.entries;
+  var list = [];
+  if (Array.isArray(src)){ list = src; }
+  else if (src && typeof src === 'object'){
+    for (var k in src){
+      if (Object.prototype.hasOwnProperty.call(src, k)){ list.push(src[k]); }
+    }
+  } else { throw new Error('структура'); }
+  if (list.length > MAX_ENTRIES){ throw new Error('размер'); }
+  var out = [];
+  for (var i = 0; i < list.length; i++){ out.push(sanitizeEntry(list[i])); }
+  return out;
+}
+
+/* ===== Загрузка архива с выбором: объединить или заменить (п. 7.2) ===== */
+var impBk = $('#impBk');
+var importInput = $('#importFile');
+$('#miImport').addEventListener('click', function(){ closeMenu(); importInput.click(); });
+importInput.addEventListener('change', function(){
+  var f = importInput.files && importInput.files[0];
+  importInput.value = '';
+  if (!f){ return; }
+  var r = new FileReader();
+  r.onerror = function(){ toast('Не удалось загрузить: файл не читается'); };
+  r.onload = function(){
+    var list = null;
+    try { list = sanitizeArchive(JSON.parse(String(r.result))); }
+    catch (e){ toast('Не удалось загрузить: файл поврежден или не подходит'); return; }
+    if (!list.length){ toast('В файле нет записей'); return; }
+    pendingImport = list;
+    $('#impText').textContent = 'В файле ' + list.length + ' ' +
+      plural(list.length, 'запись', 'записи', 'записей') + '. Что сделать с текущими?';
+    openLayer(impBk);
+  };
+  r.readAsText(f);
+});
+function applyImport(replace){
+  var list = pendingImport;
+  pendingImport = null;
+  closeLayer(impBk);
+  if (!list){ return; }
+  if (!replace && entryCount() + list.length > MAX_ENTRIES){
+    toast('Записей станет больше предела. Файл не загружен');
+    return;
+  }
+  if (replace){ store.entries = {}; store.activeEntryId = null; }
+  for (var i = 0; i < list.length; i++){ store.entries[list[i].id] = list[i]; }
+  saveNow();
+  renderList();
+  toast('Загружено записей: ' + list.length);
+}
+$('#impMerge').addEventListener('click', function(){ applyImport(false); });
+$('#impReplace').addEventListener('click', function(){ applyImport(true); });
+$('#impCancel').addEventListener('click', function(){ pendingImport = null; closeLayer(impBk); });
+impBk.addEventListener('click', function(e){ if (e.target === impBk){ pendingImport = null; closeLayer(impBk); } });
+
+/* ===== Выгрузка архива: весь корень (п. 7.2) ===== */
+$('#miExpAll').addEventListener('click', function(){
+  closeMenu();
+  if (!entryCount()){ toast('Пока нечего выгружать'); return; }
+  shareOrDownload('govori-sebe-pravdu_arhiv_' + fileStamp() + '.json',
+    JSON.stringify(store), 'application/json');
+});
+
+/* ===== Экспорт одной записи (п. 7.3): порядок - тип, дата, кто, описание, мотивы, отметка, заметка ===== */
+function flatLine(t){ return (t || '').replace(/\r?\n/g, ' '); }
+function mdMotiveLine(m){
+  var s = '- [' + KIND_LABEL[m.kind === 'notnice' ? 'notnice' : 'nice'] + '] ' + flatLine(m.text);
+  if (m.key){ s += ' (мышка)'; }
+  if (m.late){ s += ' (дописан позже)'; }
+  return s;
+}
+function buildMd(en){
+  var lines = [];
+  lines.push('# ' + (en.type === 'judge' ? 'Чужой поступок' : 'Свой поступок'));
+  lines.push('');
+  lines.push('Дата: ' + fmtDate(en.createdAt));
+  if (en.type === 'judge' && isText(en.who)){ lines.push('Кто: ' + flatLine(en.who)); }
+  lines.push('');
+  lines.push(ACT_LABEL[en.type] + ': ' + (isText(en.act) ? flatLine(en.act) : '(без описания)'));
+  lines.push('');
+  lines.push('Мотивы:');
+  var f = filledMotives(en);
+  if (f.length){
+    for (var i = 0; i < f.length; i++){ lines.push(mdMotiveLine(f[i])); }
+  } else {
+    lines.push('- (мотивы не записаны)');
+  }
+  if (en.review){
+    lines.push('');
+    lines.push('Перечитана' + (fmtDate(en.reviewAt) ? ' ' + fmtDate(en.reviewAt) : '') + ': ' + REVIEW_LABEL[en.review]);
+    if (isText(en.reviewNote)){ lines.push('Заметка: ' + flatLine(en.reviewNote)); }
+  }
+  return lines.join('\n') + '\n';
+}
+
+function legacyCopy(text, okMsg){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.setAttribute('readonly', '');
+  ta.style.position = 'fixed';
+  ta.style.left = '-9999px';
+  document.body.appendChild(ta);
+  ta.select();
+  var ok = false;
+  try { ok = document.execCommand('copy'); } catch (e){}
+  document.body.removeChild(ta);
+  toast(ok ? okMsg : 'Не удалось скопировать');
+}
+function copyText(text, okMsg){
+  if (navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(
+      function(){ toast(okMsg); },
+      function(){ legacyCopy(text, okMsg); }
+    );
+  } else {
+    legacyCopy(text, okMsg);
+  }
+}
+function fileStamp(){
+  var d = new Date();
+  var pad = function(n){ return (n < 10 ? '0' : '') + n; };
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()) +
+    '_' + pad(d.getHours()) + pad(d.getMinutes());
+}
+function downloadFile(name, text, mime){
+  var blob = new Blob([text], { type: mime });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = name;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+}
+/* На iPhone родной лист "Поделиться"; откат на скачивание (перенос из исходника) */
+function shareOrDownload(name, text, mime){
+  if (navigator.canShare){
+    try {
+      var file = new File([text], name, { type: mime });
+      if (navigator.canShare({ files: [file] })){
+        navigator.share({ files: [file], title: name }).catch(function(err){
+          if (err && err.name === 'AbortError'){ return; }
+          downloadFile(name, text, mime);
+        });
+        return;
+      }
+    } catch (e){}
+  }
+  downloadFile(name, text, mime);
+}
+
+var sheetBk = $('#sheetBk');
+$('#btnExport').addEventListener('click', function(){ if (entry){ openLayer(sheetBk); } });
+sheetBk.addEventListener('click', function(e){ if (e.target === sheetBk) closeLayer(sheetBk); });
+$('#btnExpMd').addEventListener('click', function(){
+  if (!entry){ return; }
+  closeLayer(sheetBk);
+  shareOrDownload('govori-sebe-pravdu_' + fileStamp() + '.md', buildMd(entry), 'text/markdown');
+});
+$('#btnExpNotes').addEventListener('click', function(){
+  if (!entry){ return; }
+  closeLayer(sheetBk);
+  copyText(buildMd(entry), 'Скопировано');
+});
+
+/* ===== Экспорт в Obsidian (схема obsidian://new, как в исходнике): одна запись или видимая лента ===== */
+function obsidianName(base){
+  base = normSp(String(base || '')).replace(/[\\/:*?"<>|#^\[\]]/g, ' ').replace(/\s+/g, ' ');
+  if (base.length > 60){ base = base.slice(0, 60); }
+  return base + ' (' + fileStamp() + ')';
+}
+function obsidianOpen(name, md){
+  var url = 'obsidian://new?name=' + encodeURIComponent(name) + '&content=' + encodeURIComponent(md);
+  if (url.length > 30000){ /* большой текст не лезет в адрес - откат на копирование */
+    confirmDlg('Текст слишком велик для прямой передачи в Obsidian. Скопировать md для вставки вручную?',
+      function(){ copyText(md, 'Скопировано'); },
+      'Скопировать');
+    return;
+  }
+  var a = document.createElement('a');
+  a.href = url;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+$('#btnExpObsidian').addEventListener('click', function(){
+  if (!entry){ return; }
+  closeLayer(sheetBk);
+  var base = isText(entry.act) ? entry.act :
+    ((entry.type === 'judge' ? 'Чужой поступок' : 'Свой поступок') + ' ' + fmtDate(entry.createdAt));
+  obsidianOpen(obsidianName(base), buildMd(entry));
+});
+$('#miObsAll').addEventListener('click', function(){
+  closeMenu();
+  var arr = listFiltered(); /* часть записей: сузьте поиском и фильтрами перед экспортом */
+  if (!arr.length){ toast('Нет записей по текущим фильтрам'); return; }
+  var parts = [];
+  for (var i = 0; i < arr.length; i++){ parts.push(buildMd(arr[i])); }
+  obsidianOpen(obsidianName('Говори себе правду'), parts.join('\n---\n\n'));
+});
+
+/* ===== Печать (п. 7.4): вся лента или одна запись ===== */
+var printView = $('#printView');
+var printAll = false;
+function clearPrintView(){
+  while (printView.firstChild){ printView.removeChild(printView.firstChild); }
+}
+function printEntryBlock(en){
+  var box = el('div', 'pentry');
+  var h = el('p', 'pdate');
+  h.textContent = (en.type === 'judge' ? 'Чужой поступок' : 'Свой поступок') +
+    ' · ' + fmtDate(en.createdAt) +
+    (en.type === 'judge' && isText(en.who) ? ' · ' + flatLine(en.who) : '');
+  box.appendChild(h);
+  var pa = el('p');
+  var bm = el('span', 'pmark');
+  bm.textContent = ACT_LABEL[en.type] + ': ';
+  pa.appendChild(bm);
+  pa.appendChild(document.createTextNode(isText(en.act) ? flatLine(en.act) : '(без описания)'));
+  box.appendChild(pa);
+  var f = filledMotives(en);
+  if (f.length){
+    var ul = el('ul');
+    for (var i = 0; i < f.length; i++){
+      var m = f[i];
+      var li = el('li');
+      var mk = el('span', 'pmark');
+      mk.textContent = '[' + KIND_LABEL[m.kind === 'notnice' ? 'notnice' : 'nice'] + '] ';
+      li.appendChild(mk);
+      var tail = flatLine(m.text);
+      if (m.key){ tail += ' (мышка)'; }
+      if (m.late){ tail += ' (дописан позже)'; }
+      li.appendChild(document.createTextNode(tail));
+      ul.appendChild(li);
+    }
+    box.appendChild(ul);
+  }
+  if (en.review){
+    var pr = el('p');
+    pr.textContent = 'Перечитана' + (fmtDate(en.reviewAt) ? ' ' + fmtDate(en.reviewAt) : '') +
+      ': ' + REVIEW_LABEL[en.review] +
+      (isText(en.reviewNote) ? '. ' + flatLine(en.reviewNote) : '');
+    box.appendChild(pr);
+  }
+  return box;
+}
+function buildPrintView(){
+  clearPrintView();
+  var h1 = el('h1');
+  h1.textContent = 'Говори себе правду';
+  printView.appendChild(h1);
+  if (printAll || !entry){
+    var all = entriesSorted();
+    for (var i = 0; i < all.length; i++){ printView.appendChild(printEntryBlock(all[i])); }
+  } else {
+    printView.appendChild(printEntryBlock(entry));
+  }
+}
+$('#btnExpPrint').addEventListener('click', function(){
+  if (!entry){ return; }
+  closeLayer(sheetBk);
+  printAll = false;
+  buildPrintView();
+  window.print();
+});
+$('#miPrintAll').addEventListener('click', function(){
+  closeMenu();
+  if (!entryCount()){ toast('Пока нечего печатать'); return; }
+  printAll = true;
+  buildPrintView();
+  window.print();
+});
+window.addEventListener('beforeprint', buildPrintView);
+window.addEventListener('afterprint', function(){ clearPrintView(); printAll = false; });
+
+/* ===== Итоги (п. 7.1): на лету, без полос-достижений и наград ===== */
+function statsFor(list){
+  var s = { total: 0, own: 0, judge: 0, reviewed: 0, nice: 0, notnice: 0, withKey: 0, single: 0 };
+  for (var i = 0; i < list.length; i++){
+    var en = list[i];
+    s.total++;
+    if (en.type === 'judge'){ s.judge++; } else { s.own++; }
+    if (en.review){ s.reviewed++; }
+    var f = filledMotives(en);
+    var hasKey = false;
+    for (var j = 0; j < f.length; j++){
+      if (f[j].kind === 'notnice'){ s.notnice++; } else { s.nice++; }
+      if (f[j].key === true){ hasKey = true; }
+    }
+    if (hasKey){ s.withKey++; }
+    if (f.length === 1){ s.single++; } /* кандидат "копнуть глубже" */
+  }
+  return s;
+}
+var statsBk = $('#statsBk');
+function stCell(cls, text){
+  var d = el('div', cls);
+  d.textContent = text;
+  return d;
+}
+function buildStats(){
+  var host = $('#stGrid');
+  while (host.firstChild){ host.removeChild(host.firstChild); }
+  var all = entriesSorted();
+  var lim = Date.now() - 30 * 864e5;
+  var m30 = [];
+  var days = {};
+  for (var i = 0; i < all.length; i++){
+    var t = Date.parse(all[i].createdAt);
+    if (!isNaN(t) && t >= lim){
+      m30.push(all[i]);
+      days[dayKey(all[i].createdAt)] = true;
+    }
+  }
+  var nDays = 0;
+  for (var k in days){ if (Object.prototype.hasOwnProperty.call(days, k)){ nDays++; } }
+  var a = statsFor(all), b = statsFor(m30);
+  host.appendChild(stCell('st-l', ''));
+  host.appendChild(stCell('st-h', 'все время'));
+  host.appendChild(stCell('st-h', '30 дней'));
+  function row(label, va, vb){
+    host.appendChild(stCell('st-l', label));
+    host.appendChild(stCell('st-v', String(va)));
+    host.appendChild(stCell('st-v', String(vb)));
+  }
+  row('Записей всего', a.total, b.total);
+  row('Своих поступков', a.own, b.own);
+  row('Чужих поступков', a.judge, b.judge);
+  row('Перечитано', a.reviewed, b.reviewed);
+  row('Мотивов «симпатичных»', a.nice, b.nice);
+  row('Мотивов «не очень»', a.notnice, b.notnice);
+  row('Записей с «мышкой»', a.withKey, b.withKey);
+  row('С единственным мотивом', a.single, b.single);
+  row('Дней с записями из 30', '-', nDays); /* практика ежедневна (п. 1.5) */
+}
+$('#miStats').addEventListener('click', function(){
+  closeMenu();
+  buildStats();
+  openLayer(statsBk);
+});
+statsBk.addEventListener('click', function(e){ if (e.target === statsBk){ closeLayer(statsBk); } });
+
+/* ===== Меню списка ===== */
+$('#btnListMenu').addEventListener('click', function(){ openMenu($('#popMain'), $('#btnListMenu')); });
+
+/* ===== Стоп-кран второй вкладки: кнопки плашки (п. 3.6) ===== */
+$('#tabExp').addEventListener('click', function(){
+  shareOrDownload('govori-sebe-pravdu_arhiv_' + fileStamp() + '.json',
+    JSON.stringify(store), 'application/json');
+});
+$('#tabReload').addEventListener('click', function(){ location.reload(); });
+$('#tabReload2').addEventListener('click', function(){ location.reload(); });
+
+/* ===== Закрытие по Escape (п. 4.1, десктоп) ===== */
+document.addEventListener('keydown', function(e){
+  if (e.key !== 'Escape') return;
+  if (!lockScr.hidden){ return; } /* заслон не закрывается Escape */
+  if (openPop){ closeMenu(); return; }
+  if (!dlgBk.hidden){ pendingOk = null; closeLayer(dlgBk); return; }
+  if (!impBk.hidden){ pendingImport = null; closeLayer(impBk); return; }
+  if (!aboutBk.hidden){ closeLayer(aboutBk); return; }
+  if (!sheetBk.hidden){ closeLayer(sheetBk); return; }
+  if (!compBk.hidden){ closeLayer(compBk); return; }
+  if (!digBk.hidden){ closeLayer(digBk); return; }
+  if (!statsBk.hidden){ closeLayer(statsBk); return; }
+  if (rvOpen){ closeReview(); }
+});
+
+/* ===== Код на вход и Face ID: заслон от случайного взгляда, не шифрование ===== */
+var lockScr = $('#lockScr');
+var lockMode = '';      /* unlock | old-change | old-off | set1 | set2 */
+var lockBuf = '';
+var lockFirst = '';
+var lockFails = 0;
+var lockWaitUntil = 0;
+var hiddenAt = 0;
+var LOCK_LEN = 4;
+function lockOn(){ return typeof store.settings.lockHash === 'string' && store.settings.lockHash.length > 0; }
+function bioOn(){ return lockOn() && store.settings.lockBio === true && !!store.settings.lockCredId; }
+function fnvHash(str){ /* фолбэк без crypto.subtle: для заслона достаточно */
+  var h = 0x811c9dc5;
+  for (var i = 0; i < str.length; i++){ h = Math.imul(h ^ str.charCodeAt(i), 0x01000193) >>> 0; }
+  return 'f:' + ('0000000' + h.toString(16)).slice(-8);
+}
+function hashPin(pin, salt, cb){
+  var msg = salt + ':' + pin;
+  if (window.crypto && crypto.subtle && crypto.subtle.digest && window.TextEncoder){
+    try {
+      crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg)).then(function(buf){
+        var a = new Uint8Array(buf), hx = '';
+        for (var i = 0; i < a.length; i++){ hx += (a[i] < 16 ? '0' : '') + a[i].toString(16); }
+        cb('s:' + hx);
+      }, function(){ cb(fnvHash(msg)); });
+      return;
+    } catch (e){}
+  }
+  cb(fnvHash(msg));
+}
+var LOCK_TITLE = { unlock: 'Введите код', 'old-change': 'Введите текущий код',
+  'old-off': 'Введите текущий код', set1: 'Придумайте код', set2: 'Повторите код' };
+function lockDotsDraw(){
+  var dots = $$('#lockDots .lock-dot');
+  for (var i = 0; i < dots.length; i++){ dots[i].classList.toggle('on', i < lockBuf.length); }
+}
+function lockNote(t){ $('#lockNote').textContent = t || ''; }
+function openLock(mode){
+  lockMode = mode;
+  lockBuf = '';
+  if (mode === 'set1'){ lockFirst = ''; }
+  $('#lockTitle').textContent = LOCK_TITLE[mode];
+  lockNote('');
+  lockDotsDraw();
+  $('#lockBio').hidden = !(mode === 'unlock' && bioOn());
+  if (lockScr.hidden){ lockScr.hidden = false; lock(true); }
+}
+function closeLock(){
+  if (lockScr.hidden){ return; }
+  lockScr.hidden = true;
+  lock(false);
+  lockBuf = '';
+  lockFails = 0;
+}
+function lockErr(msg){
+  lockBuf = '';
+  lockDotsDraw();
+  var d = $('#lockDots');
+  d.classList.add('err');
+  setTimeout(function(){ d.classList.remove('err'); }, 600);
+  lockNote(msg || 'Код не подошел');
+}
+function lockSubmit(){
+  var pin = lockBuf;
+  if (lockMode === 'set1'){
+    lockFirst = pin;
+    openLock('set2');
+    return;
+  }
+  if (lockMode === 'set2'){
+    if (pin !== lockFirst){
+      lockMode = 'set1';
+      lockFirst = '';
+      $('#lockTitle').textContent = LOCK_TITLE.set1;
+      lockErr('Коды не совпали, начните заново');
+      return;
+    }
+    var salt = uid();
+    hashPin(pin, salt, function(h){
+      store.settings.lockSalt = salt;
+      store.settings.lockHash = h;
+      scheduleSave();
+      closeLock();
+      updateLockRows();
+      toast('Код установлен');
+    });
+    return;
+  }
+  hashPin(pin, store.settings.lockSalt || '', function(h){
+    if (h !== store.settings.lockHash){
+      lockFails++;
+      if (lockFails >= 5){
+        lockWaitUntil = Date.now() + 30000;
+        lockFails = 0;
+        lockErr('Слишком много попыток: пауза 30 секунд');
+      } else { lockErr(); }
+      return;
+    }
+    lockFails = 0;
+    if (lockMode === 'old-change'){ openLock('set1'); return; }
+    if (lockMode === 'old-off'){
+      store.settings.lockHash = '';
+      store.settings.lockSalt = '';
+      store.settings.lockBio = false;
+      store.settings.lockCredId = '';
+      scheduleSave();
+      closeLock();
+      updateLockRows();
+      toast('Код выключен');
+      return;
+    }
+    closeLock();
+  });
+}
+function lockKey(k){
+  if (Date.now() < lockWaitUntil){
+    lockNote('Подождите ' + Math.ceil((lockWaitUntil - Date.now()) / 1000) + ' сек');
+    return;
+  }
+  if (k === 'del'){ lockBuf = lockBuf.slice(0, -1); lockDotsDraw(); return; }
+  if (lockBuf.length >= LOCK_LEN){ return; }
+  lockBuf += k;
+  lockDotsDraw();
+  if (lockBuf.length === LOCK_LEN){ setTimeout(lockSubmit, 120); }
+}
+$('#lockPad').addEventListener('click', function(e){
+  var b = e.target.closest('[data-k]');
+  if (b){ lockKey(b.getAttribute('data-k')); }
+});
+document.addEventListener('keydown', function(e){
+  if (lockScr.hidden){ return; }
+  if (e.key >= '0' && e.key <= '9'){ lockKey(e.key); }
+  else if (e.key === 'Backspace'){ lockKey('del'); }
+});
+/* Face ID через WebAuthn: локальный замок без сервера, работает в безопасном контексте */
+function b64enc(buf){
+  var a = new Uint8Array(buf), s = '';
+  for (var i = 0; i < a.length; i++){ s += String.fromCharCode(a[i]); }
+  return btoa(s);
+}
+function b64dec(str){
+  var bin = atob(str);
+  var a = new Uint8Array(bin.length);
+  for (var i = 0; i < bin.length; i++){ a[i] = bin.charCodeAt(i); }
+  return a.buffer;
+}
+function rndBytes(n){
+  var a = new Uint8Array(n);
+  if (window.crypto && crypto.getRandomValues){ crypto.getRandomValues(a); }
+  return a;
+}
+var bioAvailable = false;
+(function(){
+  if (window.PublicKeyCredential && navigator.credentials && navigator.credentials.create &&
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable){
+    try {
+      PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().then(
+        function(v){ bioAvailable = !!v; updateLockRows(); }, function(){});
+    } catch (e){}
+  }
+})();
+function bioEnable(){
+  navigator.credentials.create({ publicKey: {
+    challenge: rndBytes(32),
+    rp: { name: 'Говори себе правду' },
+    user: { id: rndBytes(16), name: 'owner', displayName: 'Владелец' },
+    pubKeyCredParams: [ { type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 } ],
+    authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
+    timeout: 60000
+  } }).then(function(cred){
+    store.settings.lockCredId = b64enc(cred.rawId);
+    store.settings.lockBio = true;
+    scheduleSave();
+    updateLockRows();
+    toast('Вход по Face ID включен');
+  }, function(){ toast('Не удалось включить Face ID'); });
+}
+function bioUnlock(){
+  if (!bioOn()){ return; }
+  navigator.credentials.get({ publicKey: {
+    challenge: rndBytes(32),
+    allowCredentials: [ { type: 'public-key', id: b64dec(store.settings.lockCredId) } ],
+    userVerification: 'required',
+    timeout: 60000
+  } }).then(function(){ lockFails = 0; closeLock(); },
+    function(){ lockNote('Face ID не подтвержден, введите код'); });
+}
+$('#lockBio').addEventListener('click', bioUnlock);
+function updateLockRows(){
+  var on = lockOn();
+  $('#btnLockSet').hidden = on;
+  $('#btnLockChange').hidden = !on;
+  $('#btnLockOff').hidden = !on;
+  $('#bioRow').hidden = !(on && (bioAvailable || bioOn()));
+  $$('#bioSeg [data-bio-opt]').forEach(function(b){
+    b.classList.toggle('active', (b.getAttribute('data-bio-opt') === 'on') === bioOn());
+  });
+}
+$('#btnLockSet').addEventListener('click', function(){ closeLayer(aboutBk); openLock('set1'); });
+$('#btnLockChange').addEventListener('click', function(){ closeLayer(aboutBk); openLock('old-change'); });
+$('#btnLockOff').addEventListener('click', function(){ closeLayer(aboutBk); openLock('old-off'); });
+$('#bioSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-bio-opt]');
+  if (!b){ return; }
+  if (b.getAttribute('data-bio-opt') === 'on'){
+    if (!bioOn()){ bioEnable(); }
+  } else {
+    store.settings.lockBio = false;
+    scheduleSave();
+    updateLockRows();
+  }
+});
+/* Повторный заслон после 5 минут в фоне */
+document.addEventListener('visibilitychange', function(){
+  if (document.visibilityState === 'hidden'){ hiddenAt = Date.now(); return; }
+  if (lockOn() && hiddenAt && Date.now() - hiddenAt > 3e5){ openLock('unlock'); }
+});
+
+/* ===== Плашка встроенного браузера (п. 8.1): один раз за сессию ===== */
+(function(){
+  var ua = navigator.userAgent || '';
+  var isIOS = /iPad|iPhone|iPod/.test(ua) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  var embedded = /Telegram/i.test(ua) || (isIOS && !/Safari/i.test(ua));
+  var shown = false;
+  try { shown = sessionStorage.getItem('gsp_banner') === '1'; } catch (e){}
+  if (embedded && !shown){
+    $('#bannerTg').hidden = false;
+    try { sessionStorage.setItem('gsp_banner', '1'); } catch (e){}
+  }
+  $('#bannerOk').addEventListener('click', function(){ $('#bannerTg').hidden = true; });
+})();
+
+/* ===== Старт (п. 4.2) ===== */
+applyTheme();
+applyQuotesSeg();
+applyDaysSeg();
+if (lockOn()){ openLock('unlock'); } /* заслон при запуске */
+if (store.activeEntryId && store.entries[store.activeEntryId]){
+  enterEditor(store.entries[store.activeEntryId]);
+} else {
+  renderList();
+  go('scrList');
+}
+if (brokenStore){
+  toast('Сохраненные записи были повреждены. Начато заново, копия отложена в настройках');
+}
+if (!storageOk && !newerStore){ /* нет доступа к хранилищу (п. 3.6) */
+  var swm = 'Сохранение недоступно: работайте через выгрузку .json';
+  ['#storeWarn', '#storeWarnEd'].forEach(function(id){
+    var w = $(id);
+    w.firstChild.textContent = swm;
+    w.hidden = false;
+  });
+  toast(swm);
+}
+if (newerStore){ /* данные более новой версии (п. 3.6): не читать, не писать поверх */
+  var nwm = 'Записи созданы более новой версией приложения. Эта версия их не изменит';
+  ['#storeWarn', '#storeWarnEd'].forEach(function(id){
+    var w = $(id);
+    w.firstChild.textContent = nwm;
+    w.hidden = false;
+  });
+  confirmDlg(nwm + '. Выгрузить их как есть?',
+    function(){ shareOrDownload('govori-sebe-pravdu_kopia_' + fileStamp() + '.json', newerRaw, 'application/json'); },
+    'Выгрузить');
+}
+})();
+</script>
+</body>
+</html>
