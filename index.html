@@ -1,4 +1,4 @@
-<!-- Говори себе правду v1.8 | по источникам: тип Столкновение с неожиданностью, Я на эмоциях, мастер пересказа шаг за шагом | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 137981 байт -->
+<!-- Говори себе правду v1.8.1 | ясность второго такта: подпись "Мои мотивы этой оценки" у чужого поступка | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 138245 байт -->
 <!DOCTYPE html>
 <html lang="ru" data-theme="auto">
 <head>
@@ -561,6 +561,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
     </div>
 
     <!-- Мотивы: строит renderMotives, ввод без перерендера списка (п. 5.3) -->
+    <div class="list-head" id="mtvHead" hidden>Мои мотивы этой оценки</div>
     <div id="mtvList"></div>
 
     <!-- Помощник честности (п. 5.6) -->
@@ -918,7 +919,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 'use strict';
 
 /* Версия приложения: дублируется в комментарии первой строки файла (п. 2.3) */
-var APP_VERSION = 'v1.8';
+var APP_VERSION = 'v1.8.1';
 
 function $(s, r){ return (r || document).querySelector(s); }
 function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -1748,6 +1749,7 @@ function applyType(){
   $('#firmField').hidden = !cl;
   $('#planField').hidden = !cl;
   $('#mtvList').hidden = cl;
+  $('#mtvHead').hidden = t !== 'judge'; /* второй такт: мотивы МОЕЙ оценки, не его */
   $('#btnAddMtv').hidden = cl;
   $('#btnDig').hidden = cl;
   $('#mtvCount').hidden = cl;
@@ -1776,7 +1778,7 @@ function motiveCard(m){
   card.appendChild(top);
   var ta = el('textarea');
   ta.rows = 1; ta.maxLength = 300;
-  ta.placeholder = 'Назовите мотив';
+  ta.placeholder = entry && entry.type === 'judge' ? 'Что двигало моей оценкой?' : 'Назовите мотив';
   ta.value = m.text;
   ta.setAttribute('data-mid', m.id);
   card.appendChild(ta);
