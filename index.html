@@ -1,4 +1,4 @@
-<!-- Говори себе правду v1.8.1 | ясность второго такта: подпись "Мои мотивы этой оценки" у чужого поступка | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 138245 байт -->
+<!-- Говори себе правду v1.9.1 | оговорка в справке: перечитывание - инструмент дневника, не предписание автора | личный дневник мотивов по второй ценности Таллинской школы менеджеров | 19.07.2026 | 140271 байт -->
 <!DOCTYPE html>
 <html lang="ru" data-theme="auto">
 <head>
@@ -480,7 +480,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
         <button class="btn-add" data-new="own">+ Свой поступок</button>
         <button class="btn-add" data-new="judge">+ Чужой поступок</button>
       </div>
-      <div class="addpair addrow2">
+      <div class="addpair addrow2" id="clashRow" hidden>
         <button class="btn-add" data-new="clash">+ Столкновение с неожиданностью</button>
       </div>
     </div>
@@ -753,6 +753,14 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
     </div>
 
     <div class="set-row">
+      <div class="set-label">Тип «Столкновение»</div>
+      <div class="seg" id="clashSeg" role="group" aria-label="Тип Столкновение с неожиданностью">
+        <button data-clash-opt="on">Вкл</button>
+        <button data-clash-opt="off">Выкл</button>
+      </div>
+    </div>
+
+    <div class="set-row">
       <div class="set-label">Перечитывать через, дней</div>
       <div class="seg" id="daysSeg" role="group" aria-label="Срок перечитывания">
         <button data-days-opt="3">3</button>
@@ -811,10 +819,10 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
       <p>Опишите поступок или оценку, затем добавляйте мотивы - их легче увидеть, восстановив картину по шагам: что предшествовало, какая была обстановка, что случилось и где возник каждый мотив. У мотива два свойства: «симпатичный | не очень» и отметка «мышка». Индикатор полноты подсказывает пять шагов честной записи, но ничего не требует. «Копнуть глубже» открывает наводящие вопросы; ответы вы сами записываете в мотивы, приложение ничего не сочиняет. Если несимпатичный мотив честно не находится, не выдумывайте его: правда - ни больше, ни меньше.</p>
 
       <p class="set-h">Перечитывание</p>
-      <p>Спустя дни запись видится иначе. Полка «Пора перечитать» собирает записи старше выбранного срока без отметки. При перечитывании исходное не правится: можно дописать поздние мотивы (они получают метку), поставить отметку - запись была честной, не вполне, главного не увидел - и заметку. Перечитывать можно повторно.</p>
+      <p>Спустя дни запись видится иначе. Полка «Пора перечитать» собирает записи старше выбранного срока без отметки. При перечитывании исходное не правится: можно дописать поздние мотивы (они получают метку), поставить отметку - запись была честной, не вполне, главного не увидел - и заметку. Перечитывать можно повторно. Полка, сроки и отметки перечитывания - инструмент этого дневника для терпеливой ежедневной практики, а не предписание В.К. Тарасова.</p>
 
       <p class="set-h">Столкновение с неожиданностью</p>
-      <p>Третий тип записи - разбор неудачи или обманутого ожидания. Переживая столкновение с неожиданностью, мы понимаем, что было пустое в нашей картине мира, и меняем его на твердое. Твердое - то, на что можно опереться и не провалиться; пустое - когда оперся, а оно подломилось. Разбор заканчивается сценарием: что делать в новых условиях новой картины мира.</p>
+      <p>Необязательный тип записи, включается в настройках: разбор неудачи или обманутого ожидания. Переживая столкновение с неожиданностью, мы понимаем, что было пустое в нашей картине мира, и меняем его на твердое. Твердое - то, на что можно опереться и не провалиться; пустое - когда оперся, а оно подломилось. Разбор заканчивается сценарием: что делать в новых условиях новой картины мира.</p>
 
       <p class="set-h">Пересказ шаг за шагом</p>
       <p>Прежде чем рассказывать правду другому, расскажите ее сначала самому себе, начиная с причин. Мастер (в меню записи) ведет по четырем шагам: причины - что предшествовало событию; обстановка - какая была погода, как были одеты, какое было настроение; хронология - что случилось, кого увидели, шаг за шагом; точка признания - где именно я пожадничал, испугался, позавидовал: дойти и признать. После этого правду уже не страшно рассказать другим.</p>
@@ -919,7 +927,7 @@ html[data-theme="dark"] .seg button.active{color:#15171B}
 'use strict';
 
 /* Версия приложения: дублируется в комментарии первой строки файла (п. 2.3) */
-var APP_VERSION = 'v1.8.1';
+var APP_VERSION = 'v1.9.1';
 
 function $(s, r){ return (r || document).querySelector(s); }
 function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
@@ -1152,6 +1160,38 @@ $('#quoteSeg').addEventListener('click', function(e){
   applyQuotesSeg();
   if (entry){ updateHint(); }
   else if (!$('#listEmpty').hidden){ renderEmptyQuote(); }
+});
+
+/* ===== Тип "Столкновение с неожиданностью": опция, по умолчанию выключен.
+   Существующие записи этого типа не прячутся никогда - скрывается только создание новых ===== */
+function clashOn(){ return store.settings.clash === true; }
+function countClash(){
+  var n = 0;
+  for (var k in store.entries){
+    if (Object.prototype.hasOwnProperty.call(store.entries, k) && store.entries[k].type === 'clash'){ n++; }
+  }
+  return n;
+}
+function applyClashOpt(){
+  $$('#clashSeg [data-clash-opt]').forEach(function(b){
+    b.classList.toggle('active', (b.getAttribute('data-clash-opt') === 'on') === clashOn());
+  });
+  $('#clashRow').hidden = !clashOn();
+  var opt = $('#typeSel option[value="clash"]');
+  var show = clashOn() || countClash() > 0;
+  if (opt){ opt.hidden = !show; }
+  if (!show && typeFilter === 'clash'){
+    typeFilter = 'all';
+    $('#typeSel').value = 'all';
+  }
+}
+$('#clashSeg').addEventListener('click', function(e){
+  var b = e.target.closest('[data-clash-opt]');
+  if (!b){ return; }
+  store.settings.clash = b.getAttribute('data-clash-opt') === 'on';
+  scheduleSave();
+  applyClashOpt();
+  if (!entry){ renderList(); }
 });
 
 /* ===== Срок полки "Пора перечитать" (п. 3.3): 3 | 7 | 14 | 30 дней ===== */
@@ -1594,6 +1634,7 @@ function listFiltered(){
 }
 
 function renderList(){
+  applyClashOpt();
   while (entryListEl.firstChild){ entryListEl.removeChild(entryListEl.firstChild); }
   var all = entriesSorted();
   $('#listFull').hidden = all.length === 0;
@@ -2612,7 +2653,7 @@ function buildStats(){
   row('Записей всего', a.total, b.total);
   row('Своих поступков', a.own, b.own);
   row('Чужих поступков', a.judge, b.judge);
-  row('Столкновений', a.clash, b.clash);
+  if (clashOn() || a.clash){ row('Столкновений', a.clash, b.clash); }
   row('Перечитано', a.reviewed, b.reviewed);
   row('Мотивов «симпатичных»', a.nice, b.nice);
   row('Мотивов «не очень»', a.notnice, b.notnice);
@@ -2896,6 +2937,7 @@ document.addEventListener('visibilitychange', function(){
 applyTheme();
 applyQuotesSeg();
 applyDaysSeg();
+applyClashOpt();
 if (lockOn()){ openLock('unlock'); } /* заслон при запуске */
 if (store.activeEntryId && store.entries[store.activeEntryId]){
   enterEditor(store.entries[store.activeEntryId]);
